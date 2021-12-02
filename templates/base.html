@@ -42,24 +42,19 @@
     </nav>
     <!-- END NAVBAR CODE -->
 
+    <!-- CARD CODE -->
     <div class="card text-center">
         <div class="card mb-3">
+        <!-- Replace the first "..." with image source -->
           <img src="..." class="card-img-top" alt="...">
           <div class="card-body">
-            <h5 class="card-title">CONTENT</h5>
-            <p class="card-text">This could either be educational content or dashboard related content</p>
-            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+            <h5 class="card-title">{% block card_name %}{% endblock %}</h5>
+            <p class="card-text">{% block card_content %}{% endblock %}</p>
+            <p class="card-text"><small class="text-muted">{% block card_footer %}{% endblock %}</small></p>
           </div>
-        </div>
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">CONTENT</h5>
-            <p class="card-text">This could either be educational content or dashboard related content</p>
-            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-          </div>
-          <img src="..." class="card-img-top" alt="...">
         </div>
     </div>
+    <!-- END CARD CODE -->
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
