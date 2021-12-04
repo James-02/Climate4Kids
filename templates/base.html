@@ -45,8 +45,7 @@
     <!-- CARD CODE -->
     <div class="card text-center">
         <div class="card mb-3">
-        <!-- Replace the first "..." with image source -->
-          <img src="..." class="card-img-top" alt="...">
+          <img src={% block card_image_source %}{% endblock %} class="card-img-top" alt="...">
           <div class="card-body">
             <h5 class="card-title">{% block card_name %}{% endblock %}</h5>
             <p class="card-text">{% block card_content %}{% endblock %}</p>
