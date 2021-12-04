@@ -1,5 +1,3 @@
-# James' version of /users/views.py from original base structure
-"""
 # IMPORTS
 from flask import Blueprint, render_template
 
@@ -26,4 +24,3 @@ def dashboard():
 @users.route('/content', methods=['GET'])
 def content():
     return render_template('content.html')
-"""
