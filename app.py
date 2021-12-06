@@ -1,12 +1,22 @@
 from flask import Flask, redirect, url_for, render_template
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
+from flask_mysqldb import MySQL
 from users.views import users
+import mysql.connector as mysql
+
+import pymysql
 
 # APP CONFIGURATION
 app = Flask(__name__)
 app.config.from_mapping(
-    SECRET_KEY='test'  # TODO: Configuration values here will later be put into a config.py
+    SECRET_KEY='test',  # TODO: Configuration values here will later be put into a config.py
+    SQLALCHEMY_DATABASE_URI='mysql+pymysql://db_name:db_password@db_hostname:3306/db_name',
+    SQLALCHEMY_TRACK_MODIFICATIONS=False
 )
 
+db = SQLAlchemy(app)
+print(db)
 
 # blueprint registration
 app.register_blueprint(users)
