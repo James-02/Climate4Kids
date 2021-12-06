@@ -1,18 +1,13 @@
-from flask import Flask, redirect, url_for, render_template
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from users.views import users
-import pymysql
 
-# APP CONFIGURATION
+# app configuration
 app = Flask(__name__)
-app.config.from_mapping(
-    SECRET_KEY='test',  # TODO: Configuration values here will later be put into a config.py
-    SQLALCHEMY_DATABASE_URI='mysql+pymysql://db_name:db_password@db_hostname:3306/db_name',
-    SQLALCHEMY_TRACK_MODIFICATIONS=False
-)
+app.config.from_object('config.DevelopmentConfig')
 
+# create database instance
 db = SQLAlchemy(app)
-print(db)
 
 # blueprint registration
 app.register_blueprint(users)
