@@ -16,7 +16,7 @@ class User(db.Model):
     last_login = db.Column(db.String(50))
     registered_on = db.Column(db.String(50), nullable=False)
 
-    __mapper_args_ = {'polymorphic_identity': 'users', 'polymorphic_on': user_type}
+    __mapper_args__ = {'polymorphic_identity': 'users', 'polymorphic_on': user_type}
 
     # constructor
     def __init__(self, user_type, name, username, password, last_login, registered_on):
@@ -36,12 +36,13 @@ class User(db.Model):
 class Student(User):
     __tablename__ = "student"
     id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
-    quiz_id = db.Column(db.Integer(), autoincrement=True, nullable=False, primary_key=True)
+    # foreign keys show one to one relationship
     group_id = db.Column(db.ForeignKey('groups.id'))
 
     # relationships
-    quizzes = db.relationship('Quiz')
+    quiz = db.relationship('Quiz')
 
+    # mapping relationship
     __mapper_args__ = {'polymorphic_identity': 'student'}
 
     def __init__(self, user_type, name, username, password, last_login, registered_on, group_id):
@@ -50,9 +51,14 @@ class Student(User):
 
 
 class Teacher(User):
+    __tablename__ = 'teacher'
+    # foreign keys show one to one relationship
     id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
-    group_id = db.Column(db.ForeignKey('groups.id'))
+    email = db.Column(db.String(60), unique=True)
 
+    group = db.relationship('Group')
+
+    # mapping relationship
     __mapper_args__ = {'polymorphic_identity': 'teacher'}
 
     def __init__(self, user_type, name, username, password, last_login, registered_on,
@@ -63,25 +69,26 @@ class Teacher(User):
 
 class Group(db.Model):
     __tablename__ = 'groups'
-    id = db.Column(db.Integer(), autoincrement=True, nullable=False, primary_key=True)
-    group_code = db.Column(db.String(10), nullable=False)
+    id = db.Column(db.String(6), nullable=False, primary_key=True)
+    teacher_id = db.Column(db.ForeignKey('teacher.id'))
     key_stage = db.Column(db.String(10), nullable=False)
+
+    # one (group) to many (student) relationship
+    students = db.relationship('Student')
 
     def __init__(self, group_code, key_stage):
         self.group_code = group_code
         self.key_stage = key_stage
 
-    # relationships
-    students = db.relationship('Student')
-    # used backref to allow the relationship to be many (group) to one (teacher)
-    teachers = db.relationship('Teacher', backref='groups')
-
 
 class Quiz(db.Model):
-    __tabelname__ = 'quizzes'
+    __tablename__ = 'quizzes'
     id = db.Column(db.Integer(), autoincrement=True, nullable=False, primary_key=True)
-    score = db.Column(db.Integer(), nullable=False)
     student_id = db.Column(db.ForeignKey('student.id'))
+    score = db.Column(db.Integer(), nullable=False)
+
+    # many (quiz) to one (student) relationship
+    quiz = db.relationship('Quiz', backref="student")
 
     def __init__(self, score, student_id):
         self.score = score
