@@ -8,7 +8,7 @@ app.config.from_object('config.DevelopmentConfig')
 
 # create database instance
 db = SQLAlchemy(app)
-
+print(db)
 # blueprint registration
 app.register_blueprint(users)
 
