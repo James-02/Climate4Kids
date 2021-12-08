@@ -45,6 +45,10 @@ def internal_error(_error):
 
 
 if __name__ == '__main__':
+    # Imports blueprints
+    from webadmin.views import webadmin_blueprint
+    app.register_blueprint(webadmin_blueprint)
+
     app.run(debug=True)
 
 
