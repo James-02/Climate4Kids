@@ -1,6 +1,5 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
-from users.views import users
 
 # app configuration
 app = Flask(__name__)
@@ -9,8 +8,6 @@ app.config.from_object('config.DevelopmentConfig')
 # create database instance
 db = SQLAlchemy(app)
 print(db)
-# blueprint registration
-app.register_blueprint(users)
 
 
 @app.route('/')
@@ -45,6 +42,9 @@ def internal_error(_error):
 
 
 if __name__ == '__main__':
+    # Blueprints
+    # import blueprints
+    from users.views import users
+    # register blueprints
+    app.register_blueprint(users)
     app.run(debug=True)
-
-
