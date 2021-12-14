@@ -1,6 +1,8 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from users.views import users
+import logging
+
 
 # app configuration
 app = Flask(__name__)
