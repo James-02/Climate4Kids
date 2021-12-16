@@ -1,7 +1,6 @@
 # created 4/12/2021 by Josh Oppenheimer
 # model of the database. Has constructors for handling the database information within python
 # (Will change as we change that details of variables and table interaction)
-
 from app import db
 
 
@@ -40,7 +39,6 @@ class Student(User):
     group_id = db.Column(db.ForeignKey('groups.id'))
 
     # relationships
-    quiz = db.relationship('Quiz')
 
     # mapping relationship
     __mapper_args__ = {'polymorphic_identity': 'student'}
@@ -69,10 +67,11 @@ class Teacher(User):
 
 class Group(db.Model):
     __tablename__ = 'groups'
-    id = db.Column(db.String(6), nullable=False, primary_key=True)
+    id = db.Column(db.String(6), nullable=False, primary_key=True, unique=True)
+    name = db.Column(db.String(100), nullable=False)
+    size = db.Column(db.Integer(), default=50, nullable=False)
     teacher_id = db.Column(db.ForeignKey('teacher.id'))
-    key_stage = db.Column(db.String(10), nullable=False)
-
+    # TODO: Update table when db works
     # one (group) to many (student) relationship
     students = db.relationship('Student')
 
@@ -88,7 +87,7 @@ class Quiz(db.Model):
     score = db.Column(db.Integer(), nullable=False)
 
     # many (quiz) to one (student) relationship
-    quiz = db.relationship('Quiz', backref="student")
+    student = db.relationship('Student')
 
     def __init__(self, score, student_id):
         self.score = score
