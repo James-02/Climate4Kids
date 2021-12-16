@@ -21,6 +21,17 @@ def dashboard():
     return render_template('dashboard.html')
 
 
+@users.route('/account', methods=['GET'])  # TODO: Change /profile to /<user id>
+def account():
+    return render_template('account.html')
+
+
 @users.route('/content', methods=['GET'])
 def content():
     return render_template('content.html')
+
+
+@users.route('/create_group', methods=['GET'])
+def create_group():
+
+    return render_template('auth/create_group.html')

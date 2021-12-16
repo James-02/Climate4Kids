@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Account
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="../static/css/styles.css"/>
+<div class="card text-center p-3 mb-5 bg-transparent border-0">
+        <div class="card mb-3 bg-transparent shadow rounded">
+          <img src="../static/media/avatar.png" class="card-img-top" alt="Default Avatar" style="float:left;width:72px;height:73px;">
+          <div class="card-body">
+
+<!--              COMMENTED OUT ALL FLASK CODE TO CHECK IF TEACHER AND PRODUCE THEIR DASHBOARD-->
+
+<!--              % if current_user.role == "teacher" %-->
+<!--              <h1 class="Teacher-Dashboard">Dashboard</h1>-->
+<!--            <p class="card-text"></p>-->
+<!--              <br>-->
+<!--              <p class="card-text">Username: </p>-->
+<!--              <p class="card-text">Email: </p>-->
+<!--              <p class="card-text">Groups: </p>-->
+<!--              <p class="card-text">Number of Students: </p>-->
+<!--          </div>-->
+
+<!--            % else %-->
+            <h1 class="User-Dashboard">(User's) Account</h1>
+            <p class="card-text"></p>
+              <br>
+              <p class="card-text">Username: </p>
+              <p class="card-text">Group: </p>
+              <p class="card-text">Quizzes Completed: </p>
+              <p class="card-text">Average Quiz Score: </p>
+          </div>
+<!--            % endif %-->
+        </div>
+
+    <div class="card mb-1 bg-transparent shadow rounded">
+          <img src="../static/media/group_avatar.png" class="card-img-top" alt="Default Avatar" style="float:left;width:72px;height:73px;">
+          <div class="card-body">
+            <h1 class="Class-Dashboard">(Group)</h1>
+            <p class="card-text"></p>
+              <br>
+              <p class="card-text">Teacher: </p>
+              <p class="card-text">Number of Students: </p>
+              <p class="card-text">Quizzes Completed: </p>
+              <p class="card-text">Average Group Quiz Score: </p>
+          </div>
+        </div>
+</div>
+{% endblock %}

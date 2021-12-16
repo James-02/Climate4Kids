@@ -1,0 +1,50 @@
+.card {
+        position: relative;
+    }
+    .card img {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+    }
+
+.account-avatar {
+    position: relative;
+    }
+    .card-img-top {
+        float: left;
+        position: center;
+        width: 43px;
+        height: 44px;
+    }
+    .nav-link {
+        float: right;
+        position: center;
+        top: -20px;
+    }
+
+footer {
+	position: fixed;
+	width: 100%;
+	left: 0;
+	bottom: 0;
+    font-size: small;
+	background-color: lightblue;
+	color: black;
+	text-align: center;
+}
+
+body, html {
+    height: 100%;
+}
+
+.hero-body {
+    height: 1000px;
+    background-image: url('../media/background2.jpg');
+    background-repeat: repeat-y;
+    background-size: cover;
+    background-color: lightblue;
+}
+
+.card-img-top {
+    border-radius: 50%;
+}
