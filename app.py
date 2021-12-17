@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+import logging
 
 # app configuration
 app = Flask(__name__)
@@ -42,9 +43,12 @@ def internal_error(_error):
 
 
 if __name__ == '__main__':
-    # Blueprints
     # import blueprints
     from users.views import users
-    # register blueprints
+    from webadmin.views import webadmin_blueprint
+   
+  # register blueprints
     app.register_blueprint(users)
+    app.register_blueprint(webadmin_blueprint)
+    
     app.run(debug=True)
