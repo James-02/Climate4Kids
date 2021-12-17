@@ -1,7 +1,7 @@
 .card {
         position: relative;
     }
-    .card img {
+    .card-img-av {
         position: absolute;
         top: 5px;
         left: 5px;
@@ -10,17 +10,28 @@
 .account-avatar {
     position: relative;
     }
-    .card-img-top {
+    .img-av {
         float: left;
         position: center;
         width: 43px;
         height: 44px;
     }
+
     .nav-link {
         float: right;
         position: center;
         top: -20px;
     }
+
+    .nav-link:hover {
+        transition: all 0.2s linear;
+        transform: scale(1.05); /* (110% zoom)*/
+    }
+
+.navbar-brand:hover {
+transition: all 0.2s linear;
+transform: scale(1.05); /* (110% zoom)*/
+}
 
 footer {
 	position: fixed;
@@ -33,18 +44,22 @@ footer {
 	text-align: center;
 }
 
-body, html {
-    height: 100%;
+html, body {
+  position: relative;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .hero-body {
-    height: 1000px;
-    background-image: url('../media/background2.jpg');
-    background-repeat: repeat-y;
+    height: 100%;
+    overflow: auto;
+    background-image: url('../media/background.jpg');
+    background-repeat: no-repeat;
     background-size: cover;
     background-color: lightblue;
-}
-
-.card-img-top {
-    border-radius: 50%;
+    background-attachment: fixed;
 }
