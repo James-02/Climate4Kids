@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %} Groups | {{group.name}} {% endblock %}
+{% block content %}
+<div class="card text-center shadow p-3 mb-5 bg-white rounded">
+    <div class="card mb-1">
+          <img src="../../static/media/group_avatar.png" class="card-img-av" alt="Default Avatar" style="float:left;width:72px;height:73px;">
+          <a href="{{ url_for('users.edit_group', group_id=group.id)}}" id="card-button" class="btn btn-success">Edit Group</a>
+          <div class="card-body">
+            <h1 class="group-dashboard">{{group.name}}</h1>
+            <p class="card-text"></p>
+              <br>
+              <p class="card-text">Group Size: {{group.size}}</p>
+              <p class="card-text"> </p>
+              <p class="card-text">Key Stage: {{group.key_stage}}</p>
+          </div>
+        </div>
+</div>
+
+<div class="card text-center shadow p-3 mb-5 bg-white rounded">
+    <div class="card mb-1">
+          <div class="card-body">
+              <a href="{{ url_for('users.create_students', group_id=group.id)}}" id="card-button" class="btn btn-success">Create Students</a>
+              <h1 class="group-dashboard">Students</h1>
+              <br>
+              <table class="table">
+                  <tr>
+                      <th>Name</th>
+                      <th>Last Login</th>
+                  </tr>
+                  <tbody>
+                    {% for student in students %}
+                        <tr>
+                            <td>{{ student.name }}</td>
+                            <td>{{ student.last_login }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+          </div>
+        </div>
+</div>
+
+{% endblock %}
