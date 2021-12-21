@@ -8,12 +8,8 @@ def name_check(_form, name):
     chars = ["*", "?", "!", "'", "^", "+", "%", "&", "/", "(", ")", "=", "}", "]", "[", "{", "$", "#", "@", "<", ">"]
     for char in name.data:
         if char in chars:
-            flash("Special characters are not allowed", category="danger")
+            flash("Special characters are not allowed", "danger")
             raise ValidationError("Name cannot include special characters.")
-
-
-def size_check():
-    pass
 
 
 class CreateGroup(FlaskForm):

@@ -1,4 +1,5 @@
 # IMPORTS
+from flask import flash
 from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for
 from models import User, Student, Group
@@ -58,6 +59,11 @@ def edit_group(group_id):
     group = Group.query.get(group_id)
     if form.validate_on_submit():
         values = {'name': form.name.data, 'size': form.size.data, 'key_stage': form.key_stage.data}
+        students = db.session.query(Student).filter_by(group_id=group_id).all()
+        if int(form.size.data) < len(students):
+            flash("You must set a size greater than or equal to the number of students in this group.", "danger")
+            return render_template('groups/edit_group.html', form=form, group_id=group_id, group=group)
+
         db.session.query(Group).filter_by(id=group_id).update(values)
         db.session.commit()
         return redirect(url_for('users.group', group_id=group_id))
