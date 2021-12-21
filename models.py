@@ -70,13 +70,15 @@ class Group(db.Model):
     id = db.Column(db.String(6), nullable=False, primary_key=True, unique=True)
     name = db.Column(db.String(100), nullable=False)
     size = db.Column(db.Integer(), default=50, nullable=False)
+    key_stage = db.Column(db.Integer(), nullable=True)
     teacher_id = db.Column(db.ForeignKey('teacher.id'))
-    # TODO: Update table when db works
     # one (group) to many (student) relationship
     students = db.relationship('Student')
 
-    def __init__(self, group_code, key_stage):
-        self.group_code = group_code
+    def __init__(self, id, name, size, key_stage):
+        self.id = id
+        self.name = name
+        self.size = size
         self.key_stage = key_stage
 
 
@@ -98,7 +100,12 @@ def init_db():
     db.drop_all()
     db.create_all()
     db.session.commit()
-    # test = User("student", "James", "james02", "testing", "111", "1111")
-    # db.session.add(test)
-    db.session.commit()
 
+    group = Group(432521, "class 4", 30, 1)
+    teacher = Teacher("teacher", "Adam Smith", "AdamSmith@gmail.com", "testing123", None, "19/12/2021 00:55:11", group_id=group.id)
+    student = Student("student", "James Newsome", "JamesNewsome5412", "TestTestTest5412", None, "19/12/2021 00:55:11", group_id=group.id)
+
+    db.session.add(student)
+    db.session.add(group)
+    db.session.add(teacher)
+    db.session.commit()
