@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Educational Page {% endblock %}
+{% block content %}
+<div>
+    <form method="POST">
+        <h5 class="card-title">{{ form.question.label }}</h5>
+        {{ form.hidden_tag() }}
+        {{ form.radio_field }}
+        {% for error in form.radio_field.errors %}
+            {{ error }}
+        {% endfor %}
+        {{ form.submit() }}
+    </form>
+</div>
+{% endblock %}
