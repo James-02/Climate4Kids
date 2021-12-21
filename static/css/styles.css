@@ -24,14 +24,19 @@
     }
 
     .nav-link:hover {
-        transition: all 0.2s linear;
-        transform: scale(1.05); /* (110% zoom)*/
+        transition: all 0.1s linear;
+        transform: scale(1.03); /* (103% zoom)*/
     }
 
 .navbar-brand:hover {
-transition: all 0.2s linear;
-transform: scale(1.05); /* (110% zoom)*/
+transition: all 0.1s linear;
+transform: scale(1.03); /* (103% zoom)*/
 }
+
+/*.btn:hover {*/
+/*    background-color: #3e8e41;*/
+/*    transition-duration: 0.3s;*/
+/*}*/
 
 footer {
 	position: fixed;
@@ -62,4 +67,11 @@ html, body {
     background-size: cover;
     background-color: lightblue;
     background-attachment: fixed;
+}
+
+#card-button {
+    position:absolute;
+    right:15px;
+    top: 15px;
+
 }
