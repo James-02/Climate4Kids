@@ -68,10 +68,26 @@ html, body {
     background-color: lightblue;
     background-attachment: fixed;
 }
-
 #card-button {
     position:absolute;
     right:15px;
     top: 15px;
+}
 
+#card-button-edit {
+    position:absolute;
+    right:147px;
+    top: 15px;
+}
+
+#card-button-del {
+    position:absolute;
+    right:15px;
+    top: 15px;
+}
+
+#card-button-create {
+    position:absolute;
+    right: 160px;
+    top: 15px;
 }
