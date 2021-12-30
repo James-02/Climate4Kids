@@ -4,7 +4,8 @@
 <div class="card text-center shadow p-3 mb-5 bg-white rounded">
     <div class="card mb-1">
           <img src="../../static/media/group_avatar.png" class="card-img-av" alt="Default Avatar" style="float:left;width:72px;height:73px;">
-          <a href="{{ url_for('users.edit_group', group_id=group.id)}}" id="card-button" class="btn btn-success">Edit Group</a>
+          <a href="{{ url_for('users.edit_group', group_id=group.id)}}" id="card-button-edit" class="btn btn-success">Edit Group</a>
+          <a href="{{ url_for('users.delete_group', group_id=group.id)}}" id="card-button-del" onclick="return confirm('Are you sure you want to delete this group?');" class="btn btn-danger">Delete Group</a>
           <div class="card-body">
             <h1 class="group-dashboard">{{group.name}}</h1>
             <p class="card-text"></p>
@@ -19,7 +20,8 @@
 <div class="card text-center shadow p-3 mb-5 bg-white rounded">
     <div class="card mb-1">
           <div class="card-body">
-              <a href="{{ url_for('users.create_students', group_id=group.id)}}" id="card-button" class="btn btn-success">Create Students</a>
+              <a href="{{ url_for('users.create_students', group_id=group.id) }}" id="card-button-create" class="btn btn-success">Add Students</a>
+              <a href="{{ url_for('users.download_students', group_id=group.id) }}" id="card-button" class="btn btn-primary">Download Data</a>
               <h1 class="group-dashboard">Students</h1>
               <br>
               <table class="table">
