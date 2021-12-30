@@ -5,7 +5,8 @@ from wtforms.validators import InputRequired, ValidationError, NumberRange
 
 
 def name_check(_form, name):
-    chars = ["*", "?", "!", "'", "^", "+", "%", "&", "/", "(", ")", "=", "}", "]", "[", "{", "$", "#", "@", "<", ">"]
+    chars = ["*", "?", "!", "'", "^", "+", "%", "&", "/", "(", ")",
+             "=", "}", "]", "[", "{", "$", "#", "@", "<", ">", '"']
     for char in name.data:
         if char in chars:
             flash("Special characters are not allowed", "danger")
