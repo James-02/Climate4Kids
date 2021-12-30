@@ -1,7 +1,10 @@
 # IMPORTS
-from flask import flash
+import csv
+import os
+
+from flask import flash, current_app
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, send_file
 from models import User, Student, Group
 from forms import CreateGroup, RegisterStudent
 from random import randint
@@ -53,6 +56,13 @@ def group(group_id):
                            students=student_list)
 
 
+@users.route('/groups/<string:group_id>/delete_group', methods=['GET'])
+def delete_group(group_id):
+    db.session.query(Group).filter_by(id=group_id).delete()
+    db.session.commit()
+    return redirect(url_for('users.dashboard'))
+
+
 @users.route('/groups/<string:group_id>/edit_group', methods=['GET', 'POST'])
 def edit_group(group_id):
     form = CreateGroup()
@@ -102,7 +112,8 @@ def create_students(group_id):
                               last_login=None, registered_on=date, group_id=group_id)
             db.session.add(student)
             db.session.commit()
-        return redirect(url_for('users.dashboard'))
+
+        return redirect(url_for('users.group', group_id=group_id))
 
     return render_template('groups/create_students.html', form=form, group_id=group_id)
 
@@ -124,3 +135,25 @@ def generate_account(name):
     password += nums
 
     return username, password
+
+
+@users.route('/groups/<string:group_id>/', methods=['GET'])
+def download_students(group_id):
+    group = Group.query.get(group_id)
+    filename = f'{group.name}.csv'
+    with open(filename, 'w', encoding='UTF8', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=['username', 'password'])
+        writer.writeheader()
+
+        for student in Student.query.filter_by(group_id=group_id):
+            writer.writerow({'username': student.username, 'last_login': student.last_login})
+
+    def generate():
+        with open(filename) as f:
+            yield from f
+
+        os.remove(filename)
+
+    response = current_app.response_class(generate(), mimetype='text/csv')
+    response.headers.set('Content-Disposition', 'attachment', filename=filename)
+    return response
