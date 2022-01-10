@@ -3,13 +3,16 @@
 {% block content %}
 <div>
     <form method="POST">
-        <h5 class="card-title">{{ form.question.label }}</h5>
-        {{ form.hidden_tag() }}
-        {{ form.radio_field }}
-        {% for error in form.radio_field.errors %}
-            {{ error }}
+        {% for question in form.questions %}
+            <h5 class="card-title">{{ question.question_text.label }}</h5>
+            {% for error in question.radio_field.errors %}
+                {{ error }}
+            {% endfor %}
+            {{ question.hidden_tag() }}
+            {{ question.radio_field }}
         {% endfor %}
-        {{ form.submit() }}
+        <p>{{ form.submit() }}</p>
+        {{ form.hidden_tag() }}
     </form>
 </div>
 {% endblock %}

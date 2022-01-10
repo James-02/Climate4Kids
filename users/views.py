@@ -1,12 +1,15 @@
 # IMPORTS
-from flask import Blueprint, render_template, redirect, flash, url_for
+from flask import Blueprint, render_template, redirect, flash, request, url_for
 from flask_login import login_user, current_user
 from wtforms.fields.core import Label
 from werkzeug.security import check_password_hash
 from werkzeug.datastructures import MultiDict
+from flask_navigation import Navigation
 
-from models import User
-from users.forms import LoginForm, QuizQuestion
+from models import User, Student, Teacher, Quiz, Question, StudentQuizScores
+from users.forms import LoginForm, QuizForm
+
+from app import db, app
 
 # CONFIG
 users = Blueprint('users', __name__, template_folder='templates')
@@ -69,42 +72,72 @@ def create_group():
     return render_template('auth/create_group.html')
 
 
-# no button for this url yet so needs to be access directly through URL
-# question_id is just a proof of concept for getting the desired question and can be left as anything e.g. 01
-@users.route('/quiz_question/<question_id>', methods=['POST', 'GET'])
-def quiz_question(question_id):
-    # should probably be done with a database. Select the desired question data - ASK IN MEETING
-    # question = string
-    # choices = list or dict - ASK IN MEETING
-    # answer = int (probably) - ASK IN MEETING
+# Displays all the quizzes available to the current user
+@users.route('/quizzes', methods=['GET', 'POST'])
+def quizzes():
+    # displays all the quizzes available to the user, currently all quizzes are available.
+    # Can be changed to select only quizzes the student hasn't done by checking the
+    # student_quiz_scores table.
+    available_quizzes = Quiz.query.all()
+    print("available quizzes: " + str(available_quizzes))
 
-    # Examples
-    question = "Which of these does not fit?"
-    choices = ("1", "Dog"), ("2", "Cat"), ("3", "Fish")
-    answer = "3"
+    with app.app_context():
+        nav = Navigation()
+        nav.init_app(app)
 
-    form = QuizQuestion()
-    # define the question label and answers
-    form.question.label = Label("question", question + " ID: " + question_id)
-    form.radio_field.choices = choices
+        nav_items = []
+
+        for quiz in available_quizzes:
+            nav_items.append(nav.Item(quiz.name, 'users.quiz_questions', {'quiz_id': quiz.id}))
+
+        nav.Bar('quiz_navbar', nav_items)
+
+        return render_template('quizzes.html')
+
+
+@users.route('/quiz_questions/<int:quiz_id>', methods=['POST', 'GET'])
+def quiz_questions(quiz_id):
+    # Example
+    # question = "Which of these is a Fish?"
+    # choices = "Dog|Cat|Fish|Wolf|Bear"
+    # correct_choice = 2
+
+    # get all questions for the specified quiz
+    questions = Question.query.filter_by(quiz_id=quiz_id).all()
+
+    # define the question label and choices for each question
+    form = QuizForm(request.form)
+    question_num = 0
+    for question in questions:
+        form.questions[question_num].question_text.label = Label("question_text", question.question_text)
+        # convert the string choices into the appropriate format
+        choices = question.choices.split("|")
+        radio_field_choices = []
+        answer_count = 0
+        for choice in choices:
+            # set the hidden value 'correct' as True for the correct answer
+            correct = (answer_count == question.correct_choice)
+            radio_field_choices.append((correct, choice))
+            answer_count += 1
+
+        form.questions[question_num].radio_field.choices = radio_field_choices
+        question_num += 1
 
     if form.validate_on_submit():
-        print(form.radio_field.data)
-        if form.radio_field.data == answer:
-            print("Correct answer")
-            # handle correct answer
-            # could be held as session data then updated to database upon completion - would then have to reveal
-            #   correct answers at the end of the test to prevent cheating.
+        # calculate the score and add to the StudentQuizScores table
+        correct_answers = 0
+        for question in form.questions.data:
+            if question['radio_field'] == 'True':
+                correct_answers += 1
+        score = (correct_answers / 5) * 100
 
-        else:
-            print("Incorrect answer")
-            # handle incorrect answer
+        # TODO: Update to use current_user to get the student_id
+        # saves student's quiz score to database
+        quiz_score = StudentQuizScores(quiz_id=quiz_id, student_id=2, score=score)
+        db.session.add(quiz_score)
+        db.session.commit()
 
-        # rendering next question - question ID's could be of the format XX-YY where XX is the quiz ID and YY is
-        #   the question ID, this way we could move to the next question by simply incrementing the quiz ID. Ending
-        #   the quiz could then be indicated by the question_id returning null when requested from the database
-        next_question_id = int(question_id) + 1
-        return redirect(f"/quiz_question/{next_question_id}")
+        return render_template('quiz_results.html', quiz_score=score)
 
     return render_template('quiz_question.html', form=form)
 

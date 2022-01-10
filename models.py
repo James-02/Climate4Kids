@@ -39,9 +39,6 @@ class Student(User):
     # foreign keys show one to one relationship
     group_id = db.Column(db.ForeignKey('groups.id'))
 
-    # relationships
-    quiz = db.relationship('Quiz')
-
     # mapping relationship
     __mapper_args__ = {'polymorphic_identity': 'student'}
 
@@ -61,10 +58,9 @@ class Teacher(User):
     # mapping relationship
     __mapper_args__ = {'polymorphic_identity': 'teacher'}
 
-    def __init__(self, user_type, name, username, password, last_login, registered_on,
-                 group_id):
+    def __init__(self, user_type, name, username, password, last_login, registered_on, email):
         super().__init__(user_type, name, username, password, last_login, registered_on)
-        self.group_id = group_id
+        self.email = email
 
 
 class Group(db.Model):
@@ -76,30 +72,121 @@ class Group(db.Model):
     # one (group) to many (student) relationship
     students = db.relationship('Student')
 
-    def __init__(self, group_code, key_stage):
-        self.group_code = group_code
+    def __init__(self, group_id, teacher_id, key_stage):
+        self.id = group_id
+        self.teacher_id = teacher_id
         self.key_stage = key_stage
 
 
 class Quiz(db.Model):
     __tablename__ = 'quizzes'
     id = db.Column(db.Integer(), autoincrement=True, nullable=False, primary_key=True)
+    name = db.Column(db.String(), nullable=False)
+
+    questions = db.relationship('Question', backref='user')
+
+    def __init__(self, name):
+        self.name = name
+
+
+class Question(db.Model):
+    __tablename__ = 'questions'
+    id = db.Column(db.Integer(), autoincrement=True, nullable=False, primary_key=True)
+    quiz_id = db.Column(db.ForeignKey('quizzes.id'))
+    question_text = db.Column(db.String(), nullable=False)
+    choices = db.Column(db.String(), nullable=False)
+    correct_choice = db.Column(db.Integer(), nullable=False)
+
+    def __init__(self, quiz_id, question_text, choices, correct_choice):
+        self.quiz_id = quiz_id
+        self.question_text = question_text
+        self.choices = choices
+        self.correct_choice = correct_choice
+
+
+class StudentQuizScores(db.Model):
+    __tablename__ = 'student_quiz_scores'
+    id = db.Column(db.Integer(), autoincrement=True, nullable=False, primary_key=True)
+    quiz_id = db.Column(db.ForeignKey('quizzes.id'))
     student_id = db.Column(db.ForeignKey('student.id'))
-    score = db.Column(db.Integer(), nullable=False)
+    score = db.Column(db.Integer())    # percentile score
 
-    # many (quiz) to one (student) relationship
-    quiz = db.relationship('Quiz', backref="student")
+    # one (quiz) to many (scores)
+    quiz = db.relationship('Quiz', foreign_keys='StudentQuizScores.quiz_id')
+    # one (student) to many (scores)
+    student = db.relationship('Student', foreign_keys='StudentQuizScores.student_id')
 
-    def __init__(self, score, student_id):
-        self.score = score
+    def __init__(self, quiz_id, student_id, score):
+        self.quiz_id = quiz_id
         self.student_id = student_id
+        self.score = score
 
 
 def init_db():
     db.drop_all()
     db.create_all()
     db.session.commit()
-    # test = User("student", "James", "james02", "testing", "111", "1111")
-    # db.session.add(test)
+
+    teacher = Teacher(user_type="teacher",
+                      name="Adam Smith",
+                      username="AdamSmith@gmail.com",
+                      password="testing123",
+                      last_login=None,
+                      registered_on="19/12/2021 00:55:11",
+                      email="teacher@mail.com")
+
+    group = Group(group_id="453153",
+                  teacher_id=teacher.id,
+                  key_stage=1)
+
+    student = Student(user_type="student",
+                      name="James Newsome",
+                      username="JamesNewsome5412",
+                      password="TestTestTest5412",
+                      last_login=None,
+                      registered_on="19/12/2021 00:55:11",
+                      group_id=group.id)
+
+    quiz = Quiz(name="Test Quiz")
+
+    question0 = Question(id=1,
+                         quiz_id=1,
+                         question_text="Which of these is blue?",
+                         choices="Red|Blue|Green|Yellow",
+                         correct_choice=1)
+
+    question1 = Question(id=2,
+                         quiz_id=1,
+                         question_text="Choose the Odd number",
+                         choices="8|2|3|4",
+                         correct_choice=2)
+
+    question2 = Question(id=3,
+                         quiz_id=1,
+                         question_text="Choose the fish",
+                         choices="dog|not fish|not fish|fish",
+                         correct_choice=3)
+
+    question3 = Question(id=4,
+                         quiz_id=1,
+                         question_text="Pick Home",
+                         choices="House|House|House|Home",
+                         correct_choice=3)
+
+    question4 = Question(id=5,
+                         quiz_id=1,
+                         question_text="Black is the correct choice here",
+                         choices="Black|Blue|Green|Yellow",
+                         correct_choice=0)
+
+    db.session.add(teacher)
+    db.session.add(group)
+    db.session.add(student)
+    db.session.add(quiz)
+    db.session.add(question0)
+    db.session.add(question1)
+    db.session.add(question2)
+    db.session.add(question3)
+    db.session.add(question4)
     db.session.commit()
 

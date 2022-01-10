@@ -6,3 +6,4 @@ flask_wtf
 wtforms
 sqlalchemy
 flask_login
+flask_navigation

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, SelectMultipleField, widgets, RadioField
+from wtforms import StringField, SubmitField, PasswordField, FormField, RadioField, FieldList
 from wtforms.validators import DataRequired
 
 
@@ -9,7 +9,13 @@ class LoginForm(FlaskForm):
     submit = SubmitField()
 
 
-class QuizQuestion(FlaskForm):
-    question = StringField("")
+class QuizQuestionForm(FlaskForm):
+    question_text = StringField("")
     radio_field = RadioField(validators=[DataRequired()])
+
+
+class QuizForm(FlaskForm):
+    questions = FieldList(FormField(QuizQuestionForm), min_entries=5)
     submit = SubmitField()
+
+
