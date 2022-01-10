@@ -2,6 +2,7 @@ Flask~=2.0.2
 flask_sqlalchemy
 python-dotenv
 pymysql
-wtforms
-flask_wtf
 werkzeug
+flask_wtf
+wtforms
+flask_login
