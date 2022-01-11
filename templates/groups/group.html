@@ -28,12 +28,16 @@
                   <tr>
                       <th>Name</th>
                       <th>Last Login</th>
+                      <th>Quizzes Completed</th>
+                      <th>Average Quiz Score</th>
                   </tr>
                   <tbody>
                     {% for student in students %}
                         <tr>
                             <td>{{ student.name }}</td>
                             <td>{{ student.last_login }}</td>
+                            <td>None</td>
+                            <td>None</td>
                         </tr>
                     {% endfor %}
                 </tbody>
