@@ -1,5 +1,6 @@
 # IMPORT
 import csv
+import logging
 import os
 import smtplib
 
@@ -9,18 +10,16 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from datetime import datetime
-from flask import flash, current_app, Blueprint, render_template, redirect, url_for
-from flask_login import login_user, current_user
+from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request
+from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.security import check_password_hash
 from models import User, Student, Group, Teacher
 from forms import CreateGroup, RegisterStudent, LoginForm
 from random import randint
 
-from app import app
-from app import db
+from app import db, app, requires_roles
 
 # CONFIG
-TEACHER_ID = 1
 SMTP_EMAIL = app.config['SMTP_EMAIL']
 SMTP_PASSWORD = app.config['SMTP_PASSWORD']
 users = Blueprint('users', __name__, template_folder='templates')
@@ -32,9 +31,9 @@ with open("static/dict.txt", "r") as r:
 
 
 # VIEWS
-@users.route('/registration', methods=['GET', 'POST'])
-def registration():
-    return render_template('auth/registration.html')
+@users.route('/register', methods=['GET', 'POST'])
+def register():
+    return render_template('auth/register.html')
 
 
 @users.route('/login', methods=['GET', 'POST'])
@@ -43,50 +42,91 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-
-        print(form.username.data)
-        print(form.password.data)
-
         # get user (if they exist) by their username
         user = User.query.filter_by(username=form.username.data).first()
-
         # check if user has entered valid credentials
         if not user or not check_password_hash(user.password, form.password.data):
             # flash a warning message and reload the page if credentials are invalid
-            flash('Incorrect Username or Password, please try again')
+            flash('Incorrect Username or Password, please try again.', 'danger')
             return render_template('auth/login.html', form=form)
 
         # login the user
-        login_user(user)
-
-        # redirect the user to the appropriate page for their role
-        if current_user.user_type == 'teacher':     # this may need changing
-            return redirect('templates/dashboard.html')
+        if request.form.get('remember_me') == 'on':
+            login_user(user, remember=True)
         else:
-            return redirect('templates/content.html')
+            login_user(user, remember=False)
+
+        date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        user.last_login = date
+        db.session.commit()
+        # redirect the user to the appropriate page for their role
+        if current_user.role == 'teacher':     # this may need changing
+            return redirect(url_for('users.dashboard'))
+        else:
+            return redirect(url_for('index'))
 
     return render_template('auth/login.html', form=form)
 
 
+# logout user profile
+@users.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
 @users.route('/dashboard', methods=['GET'])
+@login_required
 def dashboard():
-    teacher_id = TEACHER_ID # TODO replace with current_user when ready
-    groups = Group.query.filter_by(teacher_id=teacher_id).all()
+    groups = Group.query.filter_by(teacher_id=current_user.id).all()
     return render_template('dashboard.html', groups=groups)
 
 
-@users.route('/account', methods=['GET'])  # TODO: Change /profile to /<user id>
-def account():
+@users.route('/account/<string:_username>', methods=['GET'])
+@login_required
+def account(_username):
+    # TODO: implement quizzes into account.html info once they are completed
+    if current_user.role == 'student':
+        student = Student.query.get(current_user.id)
+        group = Group.query.get(student.group_id)
+        teacher = None
+        students = None
+        if group is not None:
+            students = len(group.students)
+            teacher = Teacher.query.get(group.teacher_id)
+        return render_template('account.html', group=group, teacher=teacher, students=students)
+
+    if current_user.role == 'teacher':
+        groups = Group.query.filter_by(teacher_id=current_user.id).all()
+        students = 0
+        for group in groups:
+            students += len(Student.query.filter_by(group_id=group.id).all())
+        return render_template('account.html', groups=groups, teacher=current_user, students=students)
+
     return render_template('account.html')
 
 
+@users.route('/account/<string:_username>/change_password')
+def change_password(_username):
+    return render_template('index.html')
+
+
+@users.route('/account/<string:_username>/join_group')
+def join_group(_username):
+    return render_template('index.html')
+
+
 @users.route('/content', methods=['GET'])
+@login_required
 def content():
     return render_template('content.html')
 
 
 @users.route('/groups/<string:group_id>', methods=['GET'])
+@login_required
 def group(group_id):
+    # TODO: implement quiz scores once quizzes have been implemented fully
     group_obj = Group.query.get(group_id)
     student_list = Student.query.filter_by(group_id=group_id).all()
     return render_template('groups/group.html',
@@ -94,31 +134,9 @@ def group(group_id):
                            students=student_list)
 
 
-@users.route('/groups/<string:group_id>/delete_group', methods=['GET'])
-def delete_group(group_id):
-    db.session.query(Group).filter_by(id=group_id).delete()
-    db.session.commit()
-    return redirect(url_for('users.dashboard'))
-
-
-@users.route('/groups/<string:group_id>/edit_group', methods=['GET', 'POST'])
-def edit_group(group_id):
-    form = CreateGroup()
-    group = Group.query.get(group_id)
-    if form.validate_on_submit():
-        values = {'name': form.name.data, 'size': form.size.data, 'key_stage': form.key_stage.data}
-        students = db.session.query(Student).filter_by(group_id=group_id).all()
-        if int(form.size.data) < len(students):
-            flash("You must set a size greater than or equal to the number of students in this group.", "danger")
-            return render_template('groups/edit_group.html', form=form, group_id=group_id, group=group)
-
-        db.session.query(Group).filter_by(id=group_id).update(values)
-        db.session.commit()
-        return redirect(url_for('users.group', group_id=group_id))
-    return render_template('groups/edit_group.html', form=form, group_id=group_id, group=group)
-
-
 @users.route('/groups/create_group', methods=['GET', 'POST'])
+@login_required
+@requires_roles('teacher')
 def create_group():
     form = CreateGroup()
     if form.validate_on_submit():
@@ -131,8 +149,8 @@ def create_group():
 
         else:
             group = Group(id=str(group_id), name=str(form.name.data), size=form.size.data,
-                          key_stage=form.key_stage.data, teacher_id=TEACHER_ID)
-            group.teacher_id = TEACHER_ID  # TODO: Replace this test ID with current_user
+                          key_stage=form.key_stage.data, teacher_id=current_user.id)
+            group.teacher_id = current_user.id
             db.session.add(group)
             db.session.commit()
             return redirect(url_for('users.create_students', group_id=group_id))
@@ -140,9 +158,11 @@ def create_group():
 
 
 @users.route('/groups/<string:group_id>/create_students', methods=['GET', 'POST'])
+@login_required
+@requires_roles('teacher')
 def create_students(group_id):
     form = RegisterStudent()
-    teacher = Teacher.query.get(TEACHER_ID)
+    teacher = Teacher.query.get(current_user.id)
     if form.validate_on_submit():
         names = list(filter(None, (form.names.data.strip().split("\r\n"))))
         date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -159,7 +179,7 @@ def create_students(group_id):
 
             for name in names:
                 username, password = generate_account(name)
-                student = Student(user_type="student", name=name, username=username, password=password,
+                student = Student(role="student", name=name, username=username, password=password,
                                   last_login=None, registered_on=date, group_id=group_id)
                 db.session.add(student)
                 db.session.commit()
@@ -173,18 +193,51 @@ def create_students(group_id):
     return render_template('groups/create_students.html', form=form, group_id=group_id)
 
 
+@users.route('/groups/<string:group_id>/delete_group', methods=['GET'])
+@login_required
+@requires_roles('teacher')
+def delete_group(group_id):
+    db.session.query(Group).filter_by(id=group_id).delete()
+    db.session.commit()
+    return redirect(url_for('users.dashboard'))
+
+
+@users.route('/groups/<string:group_id>/edit_group', methods=['GET', 'POST'])
+@login_required
+@requires_roles('teacher')
+def edit_group(group_id):
+    form = CreateGroup()
+    group = Group.query.get(group_id)
+    if form.validate_on_submit():
+        values = {'name': form.name.data, 'size': form.size.data, 'key_stage': form.key_stage.data}
+        students = db.session.query(Student).filter_by(group_id=group_id).all()
+        if int(form.size.data) < len(students):
+            flash("You must set a size greater than or equal to the number of students in this group.", "danger")
+            return render_template('groups/edit_group.html', form=form, group_id=group_id, group=group)
+
+        db.session.query(Group).filter_by(id=group_id).update(values)
+        db.session.commit()
+        return redirect(url_for('users.group', group_id=group_id))
+    return render_template('groups/edit_group.html', form=form, group_id=group_id, group=group)
+
+
 @users.route('/groups/<string:group_id>/', methods=['GET'])
+@login_required
+@requires_roles('teacher')
 def download_students(group_id):
     """ Method to be able to download student data, currently downloads 'name' and 'last_login',
     could be expanded further to download quiz data when the feature is available."""
     group = Group.query.get(group_id)
     filename = f'{group.name}.csv'
     with open(filename, 'w', encoding='UTF8', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=['username', 'last_login'])
+        writer = csv.DictWriter(f, fieldnames=['username', 'last_login', 'quizzes_completed', 'avg_quiz_score'])
         writer.writeheader()
 
         for student in Student.query.filter_by(group_id=group_id):
-            writer.writerow({'username': student.username, 'last_login': student.last_login})
+            writer.writerow({'username': student.username,
+                             'last_login': student.last_login,
+                             'quizzes_completed': None,
+                             'avg_quiz_score': None})
 
     def generate():
         """ Generation method using yield to allow for storage of the file in memory,
@@ -254,8 +307,8 @@ def send_student_data(group_name, filename, teacher_email):
 
 
 def generate_account(name):
-    """ Function to generate a username based on the given input and a password of three random words and 4 random digits,
-    the digits will be the same as in the username.
+    """ Function to generate a username and a password of three random words and 4 random digits,
+    the digits in the password will be the same as in the username.
     """
     password = ""
     nums = str(randint(1111, 9999))
