@@ -6,7 +6,7 @@ from werkzeug.security import check_password_hash
 from werkzeug.datastructures import MultiDict
 from flask_navigation import Navigation
 
-from models import User, Student, Teacher, Quiz, Question, StudentQuizScores
+from models import User, Student, Teacher, Quiz, Question, StudentQuizScores, Group
 from users.forms import LoginForm, QuizForm
 
 from app import db, app
@@ -75,11 +75,12 @@ def create_group():
 # Displays all the quizzes available to the current user
 @users.route('/quizzes', methods=['GET', 'POST'])
 def quizzes():
-    # displays all the quizzes available to the user, currently all quizzes are available.
-    # Can be changed to select only quizzes the student hasn't done by checking the
-    # student_quiz_scores table.
-    available_quizzes = Quiz.query.all()
-    print("available quizzes: " + str(available_quizzes))
+    # displays all the quizzes available to the user, that is, quizzes under the same key stage as the user's group
+    available_quizzes = []
+    for s, q, g in db.session.query(Student, Quiz, Group).filter(Student.id == 2,
+                                                                 Group.id == Student.group_id,
+                                                                 Quiz.key_stage == Group.key_stage).all():
+        available_quizzes.append((q.id, q.name))
 
     with app.app_context():
         nav = Navigation()
@@ -88,7 +89,7 @@ def quizzes():
         nav_items = []
 
         for quiz in available_quizzes:
-            nav_items.append(nav.Item(quiz.name, 'users.quiz_questions', {'quiz_id': quiz.id}))
+            nav_items.append(nav.Item(quiz[1], 'users.quiz_questions', {'quiz_id': quiz[0]}))
 
         nav.Bar('quiz_navbar', nav_items)
 
