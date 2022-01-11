@@ -11,6 +11,8 @@ class Config(object):
     Base Configuration
     """
     SECRET_KEY = environ.get('SECRET_KEY')
+    SMTP_EMAIL = environ.get('SMTP_EMAIL')
+    SMTP_PASSWORD = environ.get('SMTP_PASSWORD')
     DEBUG = True
     TESTING = False
     STATIC_FOLDER = 'static'
@@ -21,7 +23,7 @@ class DevelopmentConfig(Config):
     """
     Development configuration
     """
-    SQLALCHEMY_DATABASE_URI = environ.get('SQLALCHEMY_DATABASE_URI')
+    SQLALCHEMY_DATABASE_URI = environ.get('SQLALCHEMY_DATABASE_URI_TEST')
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
     FLASK_ENV = 'development'

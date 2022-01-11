@@ -47,7 +47,7 @@ if __name__ == '__main__':
     from users.views import users
     from webadmin.views import webadmin_blueprint
    
-  # register blueprints
+    # register blueprints
     app.register_blueprint(users)
     app.register_blueprint(webadmin_blueprint)
     

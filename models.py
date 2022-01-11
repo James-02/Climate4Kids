@@ -1,8 +1,8 @@
 # created 4/12/2021 by Josh Oppenheimer
 # model of the database. Has constructors for handling the database information within python
 # (Will change as we change that details of variables and table interaction)
-
 from app import db
+from werkzeug.security import generate_password_hash
 
 
 # parent class of Student and Teacher, user_type defines which of the two they are.
@@ -23,13 +23,9 @@ class User(db.Model):
         self.user_type = user_type
         self.name = name
         self.username = username
-        self.password = password
+        self.password = generate_password_hash(password)
         self.lastLogin = last_login
         self.registered_on = registered_on
-
-    # string representation
-    def __repr__(self):
-        return '<User %r>' % self.username
 
 
 # NOTE: group_id is used by both student and teacher and could be made a user property instead
@@ -40,7 +36,6 @@ class Student(User):
     group_id = db.Column(db.ForeignKey('groups.id'))
 
     # relationships
-    quiz = db.relationship('Quiz')
 
     # mapping relationship
     __mapper_args__ = {'polymorphic_identity': 'student'}
@@ -50,35 +45,40 @@ class Student(User):
         self.group_id = group_id
 
 
+#  Decryption of group codes considered, decided it was unneccessary,
+#   however implementation in future is still possible.
 class Teacher(User):
     __tablename__ = 'teacher'
     # foreign keys show one to one relationship
     id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     email = db.Column(db.String(60), unique=True)
 
-    group = db.relationship('Group')
+    # one (teacher) to many (groups) relationship
+    group = db.relationship('Group', uselist=True)
 
     # mapping relationship
     __mapper_args__ = {'polymorphic_identity': 'teacher'}
 
-    def __init__(self, user_type, name, username, password, last_login, registered_on,
-                 group_id):
+    def __init__(self, user_type, name, username, password, last_login, registered_on):
         super().__init__(user_type, name, username, password, last_login, registered_on)
-        self.group_id = group_id
 
 
 class Group(db.Model):
     __tablename__ = 'groups'
-    id = db.Column(db.String(6), nullable=False, primary_key=True)
+    id = db.Column(db.String(6), nullable=False, primary_key=True, unique=True)
+    name = db.Column(db.String(100), nullable=False)
+    size = db.Column(db.Integer(), default=50, nullable=False)
+    key_stage = db.Column(db.Integer(), nullable=True)
     teacher_id = db.Column(db.ForeignKey('teacher.id'))
-    key_stage = db.Column(db.String(10), nullable=False)
-
     # one (group) to many (student) relationship
     students = db.relationship('Student')
 
-    def __init__(self, group_code, key_stage):
-        self.group_code = group_code
+    def __init__(self, id, name, size, key_stage, teacher_id):
+        self.id = id
+        self.name = name
+        self.size = size
         self.key_stage = key_stage
+        self.teacher_id = teacher_id
 
 
 class Quiz(db.Model):
@@ -88,7 +88,7 @@ class Quiz(db.Model):
     score = db.Column(db.Integer(), nullable=False)
 
     # many (quiz) to one (student) relationship
-    quiz = db.relationship('Quiz', backref="student")
+    student = db.relationship('Student')
 
     def __init__(self, score, student_id):
         self.score = score
@@ -99,7 +99,33 @@ def init_db():
     db.drop_all()
     db.create_all()
     db.session.commit()
-    # test = User("student", "James", "james02", "testing", "111", "1111")
-    # db.session.add(test)
+
+    teacher = Teacher(user_type="teacher",
+                      name="Adam Smith",
+                      username="AdamSmith@gmail.com",
+                      password="testing123",
+                      last_login=None,
+                      registered_on="19/12/2021 00:55:11")
+
+    group = Group(id="453153",
+                  name="class 4",
+                  size=30,
+                  key_stage=1,
+                  teacher_id=teacher.id)
+
+    student = Student(user_type="student",
+                      name="James Newsome",
+                      username="JamesNewsome5412",
+                      password="TestTestTest5412",
+                      last_login=None,
+                      registered_on="19/12/2021 00:55:11",
+                      group_id=group.id)
+
+    db.session.add(teacher)
+    db.session.add(group)
+    db.session.add(student)
+    db.session.commit()
+
+    group.teacher_id = teacher.id
     db.session.commit()
 
