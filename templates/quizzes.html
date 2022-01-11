@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Quizzes {% endblock %}
+{% block content %}
+<ul>
+    {% for item in nav.quiz_navbar %}
+    <li class="{{ 'active' if item.is_active else '' }}">
+        <a href="{{ item.url }}">{{ item.label }}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
