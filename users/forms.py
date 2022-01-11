@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask import flash
-from wtforms import StringField, IntegerField, SubmitField, TextAreaField
+from wtforms import StringField, IntegerField, SubmitField, TextAreaField, PasswordField
 from wtforms.validators import DataRequired, InputRequired, ValidationError, NumberRange
 
 
@@ -22,9 +22,10 @@ class CreateGroup(FlaskForm):
 
 class RegisterStudent(FlaskForm):
     names = TextAreaField(validators=[InputRequired(), name_check])
+    submit = SubmitField()
 
 
 class LoginForm(FlaskForm):
-    username = StringField(validators=[DataRequired()])
+    username = StringField(validators=[DataRequired(), name_check])
     password = PasswordField(validators=[DataRequired()])
     submit = SubmitField()
