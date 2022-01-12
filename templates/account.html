@@ -1,49 +1,98 @@
 {% extends "base.html" %}
-{% block title %}Account
-{% endblock %}
+{% block title %}Account | {{ current_user.name }}{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="../static/css/styles.css"/>
-<div class="card text-center shadow p-3 mb-5 bg-white rounded">
-        <div class="card mb-1">
-          <img src="../static/media/avatar.png" class="card-img-av" alt="Default Avatar" style="float:left;width:72px;height:73px;">
-          <div class="card-body">
-
-<!--              COMMENTED OUT ALL FLASK CODE TO CHECK IF TEACHER AND PRODUCE THEIR DASHBOARD-->
-
-<!--              % if current_user.role == "teacher" %-->
-<!--              <h1 class="Teacher-Dashboard">Dashboard</h1>-->
-<!--            <p class="card-text"></p>-->
-<!--              <br>-->
-<!--              <p class="card-text">Username: </p>-->
-<!--              <p class="card-text">Email: </p>-->
-<!--              <p class="card-text">Groups: </p>-->
-<!--              <p class="card-text">Number of Students: </p>-->
-<!--          </div>-->
-
-<!--            % else %-->
-            <h1 class="User-Dashboard">(User's) Account</h1>
-            <p class="card-text"></p>
-              <br>
-              <p class="card-text">Username: </p>
-              <p class="card-text">Group: </p>
-              <p class="card-text">Quizzes Completed: </p>
-              <p class="card-text">Average Quiz Score: </p>
-          </div>
-<!--            % endif %-->
-        </div>
-</div>
-<div class="card text-center shadow p-3 mb-5 bg-white rounded">
+{% if current_user.role == 'student' or current_user.role == 'teacher' %}
+<div class="card text-center border-primary shadow p-3 mb-5 bg-white rounded">
     <div class="card mb-1">
-          <img src="../static/media/group_avatar.png" class="card-img-av" alt="Default Avatar" style="float:left;width:72px;height:73px;">
+      <img src="../static/media/avatar.png" class="card-img-av" alt="Default Avatar" style="float:left;width:72px;height:73px;">
+      <div class="card-body">
+        <h1 class="user-dashboard">{{ current_user.name}}</h1>
+          <br>
+          <table class="table">
+              {% if current_user.role == 'student' %}
+              <tr>
+                  <th>Username</th>
+                  <th>Registered On</th>
+                  <th>Last Login</th>
+                  <th>Quizzes Completed</th>
+                  <th>Average Quiz Score</th>
+              </tr>
+              <tbody>
+                <tr>
+                    <td>{{ current_user.username }}</td>
+                    <td>{{ current_user.registered_on }}</td>
+                    <td>{{ current_user.last_login }}</td>
+                    <td>None</td>
+                    <td>None</td>
+                </tr>
+            </tbody>
+          {% endif %}
+              {% if current_user.role == 'teacher' %}
+              <tr>
+                  <th>Username</th>
+                  <th>Registered On</th>
+                  <th>Last Login</th>
+                  <th>Number of Groups</th>
+                  <th>Number of Students</th>
+              </tr>
+              <tbody>
+                <tr>
+                    <td>{{ current_user.username }}</td>
+                    <td>{{ current_user.registered_on }}</td>
+                    <td>{{ current_user.last_login }}</td>
+                    <td>{{ groups | length }}</td>
+                    <td>{{ students }}</td>
+                </tr>
+            </tbody>
+              {% endif %}
+          </table>
+      </div>
+    </div>
+</div>
+<div class="card text-center border-primary shadow p-3 mb-5 bg-white rounded">
+        <div class="card mb-1">
+          <img src="../static/media/group_avatar.png" class="card-img-av" alt="Default Group Avatar" style="float:left;width:72px;height:73px;">
           <div class="card-body">
-            <h1 class="class-dashboard">(Group)</h1>
-            <p class="card-text"></p>
+            <h1 class="group-dashboard">Groups</h1>
+          <br>
+              <table class="table">
+                  <tr>
+                      <th>Group</th>
+                      <th>Group Code</th>
+                      <th>Teacher</th>
+                      <th>Number of Students</th>
+                      <th>Key Stage</th>
+                      <th>Average Quiz Score</th>
+                  </tr>
+                  <tbody>
+                  {% if current_user.role == 'teacher' %}
+                      {% for group in groups %}
+                          <tr>
+                              <td>{{ group.name }}</td>
+                              <td>{{ group.id }}</td>
+                              <td>{{ teacher.name }}</td>
+                              <td>{{ group.students|length }}</td>
+                              <td>{{ group.key_stage }}</td>
+                              <td>None</td>
+                          </tr>
+                      {% endfor %}
+                  {% endif %}
+                  {% if current_user.role == 'student' %}
+                      <tr>
+                          <td>{{ group.name }}</td>
+                          <td>{{ group.id }}</td>
+                          <td>{{ teacher.name }}</td>
+                          <td>{{ students }}</td>
+                          <td>{{ group.key_stage }}</td>
+                          <td>None</td>
+                      </tr>
+                      </tbody>
+                  {% endif %}
+              </table>
               <br>
-              <p class="card-text">Teacher: </p>
-              <p class="card-text">Number of Students: </p>
-              <p class="card-text">Quizzes Completed: </p>
-              <p class="card-text">Average Group Quiz Score: </p>
           </div>
         </div>
 </div>
+{% endif %}
 {% endblock %}

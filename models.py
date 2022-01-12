@@ -1,26 +1,28 @@
 # created 4/12/2021 by Josh Oppenheimer
 # model of the database. Has constructors for handling the database information within python
 # (Will change as we change that details of variables and table interaction)
+from flask_login import UserMixin
+
 from app import db
 from werkzeug.security import generate_password_hash
 
 
-# parent class of Student and Teacher, user_type defines which of the two they are.
-class User(db.Model):
+# parent class of Student and Teacher, role defines which of the two they are.
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer(), autoincrement=True, nullable=False, primary_key=True)
-    user_type = db.Column(db.String(50), nullable=False)
+    role = db.Column(db.String(50), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     username = db.Column(db.String(100), nullable=False, unique=True)
-    password = db.Column(db.String(100), nullable=False, unique=True)
+    password = db.Column(db.String(255), nullable=False, unique=True)
     last_login = db.Column(db.String(50))
     registered_on = db.Column(db.String(50), nullable=False)
 
-    __mapper_args__ = {'polymorphic_identity': 'users', 'polymorphic_on': user_type}
+    __mapper_args__ = {'polymorphic_identity': 'users', 'polymorphic_on': role}
 
     # constructor
-    def __init__(self, user_type, name, username, password, last_login, registered_on):
-        self.user_type = user_type
+    def __init__(self, role, name, username, password, last_login, registered_on):
+        self.role = role
         self.name = name
         self.username = username
         self.password = generate_password_hash(password)
@@ -38,8 +40,8 @@ class Student(User):
     # mapping relationship
     __mapper_args__ = {'polymorphic_identity': 'student'}
 
-    def __init__(self, user_type, name, username, password, last_login, registered_on, group_id):
-        super().__init__(user_type, name, username, password, last_login, registered_on)
+    def __init__(self, role, name, username, password, last_login, registered_on, group_id):
+        super().__init__(role, name, username, password, last_login, registered_on)
         self.group_id = group_id
 
 
@@ -71,7 +73,7 @@ class Group(db.Model):
     key_stage = db.Column(db.ForeignKey('key_stage.key_stage'))
 
     # one (group) to many (student) relationship
-    students = db.relationship('Student')
+    students = db.relationship('Student', backref='groups')
 
     def __init__(self, id, name, size, teacher_id, key_stage):
         self.id = id
@@ -143,22 +145,22 @@ def init_db():
     db.create_all()
     db.session.commit()
 
-    teacher = Teacher(user_type="teacher",
+    teacher = Teacher(role="teacher",
                       name="Adam Smith",
-                      username="AdamSmith@gmail.com",
-                      password="testing123",
+                      username="AdamSmith3412",
+                      password="Testing123",
                       last_login=None,
                       registered_on="19/12/2021 00:55:11",
-                      email="teacher@mail.com")
+                      email="diversitycontracters1@gmail.com")
 
     group = Group(id="453153",
-                  name="class 4",
+                  name="Class 4",
                   size=30,
                   teacher_id=teacher.id,
                   key_stage=1)
 
 
-    student = Student(user_type="student",
+    student = Student(role="student",
                       name="James Newsome",
                       username="JamesNewsome5412",
                       password="TestTestTest5412",
@@ -226,7 +228,9 @@ def init_db():
     key_stage2 = KeyStage(key_stage=1)
 
     db.session.add(teacher)
+    db.session.commit()
     db.session.add(group)
+    db.session.commit()
     db.session.add(student)
     db.session.add(quiz0)
     db.session.add(quiz1)

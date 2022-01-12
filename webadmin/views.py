@@ -21,4 +21,4 @@ def webadmin():
 #        enteries = f.read().splitlines()[-25:]
 #        enteries.reverse()
 #
- #   return render_template('webadmin.html', logs=enteries)
+#   return render_template('webadmin.html', logs=enteries)

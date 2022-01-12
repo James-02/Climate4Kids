@@ -1,6 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Educational Page {% endblock %}
+{% block title %}Educational Content{% endblock %}
 {% block content %}
+{#    {% if current_user.key_stage == 1 %} FIND A WAY TO GET THE CURRENT_USER's KEY_STAGE#}
 <div class="card text-center shadow p-3 mb-5 bg-white rounded">
         <div class="card mb-1">
           <img src="https://www.worldlandtrust.org/wp-content/uploads/2017/10/Santa-cruz-forest-banner.jpg" class="card-img-top" alt="A forest">
@@ -25,6 +26,7 @@
           </div>
         </div>
 </div>
+{#    {% endif %}#}
 
     <div class="card text-center shadow p-3 mb-5 bg-white rounded">
         <div class="card mb-1">

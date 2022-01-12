@@ -22,10 +22,11 @@ class CreateGroup(FlaskForm):
 
 class RegisterStudent(FlaskForm):
     names = TextAreaField(validators=[InputRequired(), name_check])
+    submit = SubmitField()
 
 
 class LoginForm(FlaskForm):
-    username = StringField(validators=[DataRequired()])
+    username = StringField(validators=[DataRequired(), name_check])
     password = PasswordField(validators=[DataRequired()])
     submit = SubmitField()
 
