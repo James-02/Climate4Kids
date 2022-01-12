@@ -10,7 +10,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from datetime import datetime
-from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request
+from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request, session
 from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.security import check_password_hash
 from models import User, Student, Group, Teacher
@@ -38,15 +38,28 @@ def register():
 
 @users.route('/login', methods=['GET', 'POST'])
 def login():
+    # create login attribute if it doesnt exist
+    if not session.get('logins'):
+        session['logins'] = 0
+    # display error if user has made 4+ invalid login attempts
+    elif session.get('logins') > 3:
+        flash('Exceeded 3 login attempts')
+
+
     # create login form object
     form = LoginForm()
 
     if form.validate_on_submit():
+        # increment login attempt counter
+        session['logins'] += 1
+
         # get user (if they exist) by their username
         user = User.query.filter_by(username=form.username.data).first()
         # check if user has entered valid credentials
         if not user or not check_password_hash(user.password, form.password.data):
             # flash a warning message and reload the page if credentials are invalid
+            if session['logins'] > 3:
+                flash("Exceeded login attempts.")
             flash('Incorrect Username or Password, please try again.', 'danger')
             return render_template('auth/login.html', form=form)
 
@@ -56,6 +69,7 @@ def login():
         else:
             login_user(user, remember=False)
 
+        session['logins'] = 0 # reset login counter to 0 on a successful login
         date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         user.last_login = date
         db.session.commit()
