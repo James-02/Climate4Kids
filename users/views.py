@@ -1,3 +1,4 @@
+
 # IMPORT
 import csv
 import logging
@@ -11,10 +12,13 @@ from email.mime.text import MIMEText
 
 from datetime import datetime
 from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request
+from wtforms.fields.core import Label
 from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.security import check_password_hash
-from models import User, Student, Group, Teacher
-from forms import CreateGroup, RegisterStudent, LoginForm
+from flask_navigation import Navigation
+
+from models import User, Student, Group, Teacher, Quiz, Question, StudentQuizScores
+from forms import CreateGroup, RegisterStudent, LoginForm, QuizForm
 from random import randint
 
 from app import db, app, requires_roles
@@ -60,8 +64,8 @@ def login():
         user.last_login = date
         db.session.commit()
         # redirect the user to the appropriate page for their role
-        if current_user.role == 'teacher':     # this may need changing
-            return redirect(url_for('users.dashboard'))
+        if current_user.user_type == 'teacher':  # this may need changing
+            return redirect('templates/dashboard.html')
         else:
             return redirect(url_for('index'))
 
@@ -121,6 +125,77 @@ def join_group(_username):
 @login_required
 def content():
     return render_template('content.html')
+
+
+# Displays all the quizzes available to the current user
+@users.route('/quizzes', methods=['GET', 'POST'])
+def quizzes():
+    # displays all the quizzes available to the user, that is, quizzes under the same key stage as the user's group
+    available_quizzes = []
+    for s, q, g in db.session.query(Student, Quiz, Group).filter(Student.id == 2,
+                                                                 Group.id == Student.group_id,
+                                                                 Quiz.key_stage == Group.key_stage).all():
+        available_quizzes.append((q.id, q.name))
+
+    with app.app_context():
+        nav = Navigation()
+        nav.init_app(app)
+
+        nav_items = []
+
+        for quiz in available_quizzes:
+            nav_items.append(nav.Item(quiz[1], 'users.quiz_questions', {'quiz_id': quiz[0]}))
+
+        nav.Bar('quiz_navbar', nav_items)
+
+        return render_template('quizzes.html')
+
+
+@users.route('/quiz_questions/<int:quiz_id>', methods=['POST', 'GET'])
+def quiz_questions(quiz_id):
+    # Example
+    # question = "Which of these is a Fish?"
+    # choices = "Dog|Cat|Fish|Wolf|Bear"
+    # correct_choice = 2
+
+    # get all questions for the specified quiz
+    questions = Question.query.filter_by(quiz_id=quiz_id).all()
+
+    # define the question label and choices for each question
+    form = QuizForm(request.form)
+    question_num = 0
+    for question in questions:
+        form.questions[question_num].question_text.label = Label("question_text", question.question_text)
+        # convert the string choices into the appropriate format
+        choices = question.choices.split("|")
+        radio_field_choices = []
+        answer_count = 0
+        for choice in choices:
+            # set the hidden value 'correct' as True for the correct answer
+            correct = (answer_count == question.correct_choice)
+            radio_field_choices.append((correct, choice))
+            answer_count += 1
+
+        form.questions[question_num].radio_field.choices = radio_field_choices
+        question_num += 1
+
+    if form.validate_on_submit():
+        # calculate the score and add to the StudentQuizScores table
+        correct_answers = 0
+        for question in form.questions.data:
+            if question['radio_field'] == 'True':
+                correct_answers += 1
+        score = (correct_answers / 5) * 100
+
+        # TODO: Update to use current_user to get the student_id
+        # saves student's quiz score to database
+        quiz_score = StudentQuizScores(quiz_id=quiz_id, student_id=2, score=score)
+        db.session.add(quiz_score)
+        db.session.commit()
+
+        return render_template('quiz_results.html', quiz_score=score)
+
+    return render_template('quiz_question.html', form=form)
 
 
 @users.route('/groups/<string:group_id>', methods=['GET'])
@@ -326,5 +401,6 @@ def generate_account(name):
 
   
 """  
-Useful explanation of querying with Inheritance: https://docs.sqlalchemy.org/en/14/orm/inheritance_loading.html
-"""
+
+# Useful explanation of querying with Inheritance: https://docs.sqlalchemy.org/en/14/orm/inheritance_loading.html
+

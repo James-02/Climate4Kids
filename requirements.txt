@@ -6,3 +6,4 @@ werkzeug
 flask_wtf
 wtforms
 flask_login
+flask_navigation
