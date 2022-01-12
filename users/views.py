@@ -160,7 +160,6 @@ def quiz_questions(quiz_id):
     return render_template('quiz_question.html', form=form)
 
 
-"""
 @users.route('/groups/<string:group_id>', methods=['GET'])
 def group(group_id):
     group_obj = Group.query.get(group_id)
