@@ -16,7 +16,7 @@ from wtforms.fields.core import Label
 from werkzeug.security import check_password_hash
 from flask_navigation import Navigation
 
-from models import User, Student, Group, Teacher, Quiz, Questions, StudentQuizScores
+from models import User, Student, Group, Teacher, Quiz, Question, StudentQuizScores
 from forms import CreateGroup, RegisterStudent, LoginForm, QuizForm
 from random import randint
 
