@@ -14,7 +14,7 @@ from flask import flash, current_app, Blueprint, render_template, redirect, url_
 from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.security import check_password_hash
 from models import User, Student, Group, Teacher
-from forms import CreateGroup, RegisterStudent, LoginForm
+from users.forms import CreateGroup, RegisterStudent, LoginForm
 from random import randint
 
 from app import db, app, requires_roles
