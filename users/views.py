@@ -18,7 +18,7 @@ from werkzeug.security import check_password_hash
 from flask_navigation import Navigation
 
 from models import User, Student, Group, Teacher, Quiz, Question, StudentQuizScores
-from forms import CreateGroup, RegisterStudent, LoginForm, QuizForm
+from users.forms import CreateGroup, RegisterStudent, LoginForm, QuizForm
 from random import randint
 
 from app import db, app, requires_roles
@@ -30,7 +30,7 @@ users = Blueprint('users', __name__, template_folder='templates')
 
 # Read Dictionary
 # REFERENCE: https://eslgrammar.org/list-of-nouns/#List_of_Nouns_in_English
-with open("static/dict.txt", "r") as r:
+with open("C:/Users/Joppy/Documents/Programming/UniStuff/2033/Stage2-Team-Project/static/dict.txt", "r") as r:
     words = r.readlines()
 
 
@@ -64,7 +64,7 @@ def login():
         user.last_login = date
         db.session.commit()
         # redirect the user to the appropriate page for their role
-        if current_user.user_type == 'teacher':  # this may need changing
+        if current_user.role == 'teacher':  # this may need changing
             return redirect('templates/dashboard.html')
         else:
             return redirect(url_for('index'))
@@ -399,8 +399,6 @@ def generate_account(name):
 
     return username, password
 
-  
-"""  
 
 # Useful explanation of querying with Inheritance: https://docs.sqlalchemy.org/en/14/orm/inheritance_loading.html
 
