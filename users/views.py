@@ -30,7 +30,7 @@ users = Blueprint('users', __name__, template_folder='templates')
 
 # Read Dictionary
 # REFERENCE: https://eslgrammar.org/list-of-nouns/#List_of_Nouns_in_English
-with open("C:/Users/Joppy/Documents/Programming/UniStuff/2033/Stage2-Team-Project/static/dict.txt", "r") as r:
+with open("static/dict.txt", "r") as r:
     words = r.readlines()
 
 
@@ -99,7 +99,9 @@ def account(_username):
         if group is not None:
             students = len(group.students)
             teacher = Teacher.query.get(group.teacher_id)
-        return render_template('account.html', group=group, teacher=teacher, students=students)
+        average_quiz_score, quizzes_completed = get_student_average_quiz_score(current_user.id)
+        return render_template('account.html', group=group, teacher=teacher, students=students,
+                               average_quiz_score=average_quiz_score, quizzes_completed=quizzes_completed)
 
     if current_user.role == 'teacher':
         groups = Group.query.filter_by(teacher_id=current_user.id).all()
@@ -129,10 +131,12 @@ def content():
 
 # Displays all the quizzes available to the current user
 @users.route('/quizzes', methods=['GET', 'POST'])
+@login_required
+@requires_roles('student')
 def quizzes():
     # displays all the quizzes available to the user, that is, quizzes under the same key stage as the user's group
     available_quizzes = []
-    for s, q, g in db.session.query(Student, Quiz, Group).filter(Student.id == 2,
+    for s, q, g in db.session.query(Student, Quiz, Group).filter(Student.id == current_user.id,
                                                                  Group.id == Student.group_id,
                                                                  Quiz.key_stage == Group.key_stage).all():
         available_quizzes.append((q.id, q.name))
@@ -148,10 +152,12 @@ def quizzes():
 
         nav.Bar('quiz_navbar', nav_items)
 
-        return render_template('quizzes.html')
+        return render_template('quizzes.html', current_user=current_user)
 
 
 @users.route('/quiz_questions/<int:quiz_id>', methods=['POST', 'GET'])
+@login_required
+@requires_roles('student')
 def quiz_questions(quiz_id):
     # Example
     # question = "Which of these is a Fish?"
@@ -187,9 +193,8 @@ def quiz_questions(quiz_id):
                 correct_answers += 1
         score = (correct_answers / 5) * 100
 
-        # TODO: Update to use current_user to get the student_id
         # saves student's quiz score to database
-        quiz_score = StudentQuizScores(quiz_id=quiz_id, student_id=2, score=score)
+        quiz_score = StudentQuizScores(quiz_id=quiz_id, student_id=current_user.id, score=score)
         db.session.add(quiz_score)
         db.session.commit()
 
@@ -201,12 +206,36 @@ def quiz_questions(quiz_id):
 @users.route('/groups/<string:group_id>', methods=['GET'])
 @login_required
 def group(group_id):
-    # TODO: implement quiz scores once quizzes have been implemented fully
     group_obj = Group.query.get(group_id)
     student_list = Student.query.filter_by(group_id=group_id).all()
+
+    students_info = []
+    # for each student get their Name, Last login, how many quizzes they have completed and their average quiz score
+    for student in student_list:
+        average_score, num_of_quizzes = get_student_average_quiz_score(student.id)
+        student_info = [student.name, student.last_login, num_of_quizzes, int(average_score)]
+
+        students_info.append(student_info)
+
     return render_template('groups/group.html',
                            group=group_obj,
-                           students=student_list)
+                           students_info=students_info)
+
+
+# returns the average score and number of quizzes completed by the specified student
+def get_student_average_quiz_score(student_id):
+    student_quiz_scores = StudentQuizScores.query.filter_by(student_id=student_id).all()
+
+    num_of_quizzes = len(student_quiz_scores)
+    num_of_quizzes = 0
+    if num_of_quizzes == 0:
+        return 0, 0
+    else:
+        sum_of_all_scores = 0
+        for quiz_score in student_quiz_scores:
+            sum_of_all_scores += quiz_score.score
+
+        return sum_of_all_scores / num_of_quizzes, num_of_quizzes
 
 
 @users.route('/groups/create_group', methods=['GET', 'POST'])

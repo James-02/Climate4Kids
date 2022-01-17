@@ -32,12 +32,12 @@
                       <th>Average Quiz Score</th>
                   </tr>
                   <tbody>
-                    {% for student in students %}
+                    {% for student_info in students_info %}
                         <tr>
-                            <td>{{ student.name }}</td>
-                            <td>{{ student.last_login }}</td>
-                            <td>None</td>
-                            <td>None</td>
+                            <td>{{ student_info[0] }}</td>
+                            <td>{{ student_info[1] }}</td>
+                            <td>{{ student_info[2] }}</td>
+                            <td>{{ student_info[3] }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

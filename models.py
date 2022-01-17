@@ -45,7 +45,7 @@ class Student(User):
         self.group_id = group_id
 
 
-#  Decryption of group codes considered, decided it was unneccessary,
+#  Decryption of group codes considered, decided it was unnecessary,
 #   however implementation in future is still possible.
 class Teacher(User):
     __tablename__ = 'teacher'
@@ -159,7 +159,6 @@ def init_db():
                   teacher_id=teacher.id,
                   key_stage=1)
 
-
     student = Student(role="student",
                       name="James Newsome",
                       username="JamesNewsome5412",
@@ -168,64 +167,104 @@ def init_db():
                       registered_on="19/12/2021 00:55:11",
                       group_id=group.id)
 
-    quiz0 = Quiz(name="Test Quiz",
+    quiz0 = Quiz(name="Weather and Climate",
                  key_stage=1)
 
     question0 = Question(quiz_id=1,
-                         question_text="Which of these is blue?",
-                         choices="Red|Blue|Green|Yellow",
+                         question_text="What is Weather?",
+                         choices="If's it's raining or not"
+                                 "|The daily conditions in a small area"
+                                 "|The average temperature"
+                                 "|The number of clouds in the sky",
                          correct_choice=1)
 
     question1 = Question(quiz_id=1,
-                         question_text="Choose the Odd number",
-                         choices="8|2|3|4",
-                         correct_choice=2)
+                         question_text="What is Climate?",
+                         choices="The long term weather pattern over a large area"
+                                 "|The average temperature of the world"
+                                 "|The weather at the end of the year"
+                                 "|The weather over a large area",
+                         correct_choice=0)
 
     question2 = Question(quiz_id=1,
-                         question_text="Choose the fish",
-                         choices="dog|not fish|not fish|fish",
-                         correct_choice=3)
+                         question_text="What is the Climate like in the United Kingdom?",
+                         choices="Cool summers and warm winters"
+                                 "|Very hot and windy all year"
+                                 "|Cool winters and warm summers"
+                                 "|Very Cold with no rain all year",
+                         correct_choice=2)
 
     question3 = Question(quiz_id=1,
-                         question_text="Pick Home",
-                         choices="House|House|House|Home",
+                         question_text="What is the Climate like in the desert?",
+                         choices="Cold with lots of snowfall"
+                                 "|Hot and lots of rainfall"
+                                 "|Cold and windy"
+                                 "|Very hot and dry all",
                          correct_choice=3)
 
     question4 = Question(quiz_id=1,
-                         question_text="Black is the correct choice here",
-                         choices="Black|Blue|Green|Yellow",
+                         question_text="What is the Climate like in the rainforest",
+                         choices="Hot all year and very wet"
+                                 "|Hot and dry"
+                                 "|Cold and lots of rainfall"
+                                 "|Very hot and windy",
                          correct_choice=0)
 
-    quiz1 = Quiz(name="Other Quiz",
+    quiz1 = Quiz(name="Climate Change",
                  key_stage=2)
 
     question5 = Question(quiz_id=2,
-                         question_text="Which of these is blue?",
-                         choices="Red|Blue|Green|Yellow",
-                         correct_choice=1)
+                         question_text="What is Climate Change?",
+                         choices="Describes the weather changing each day"
+                                 "|Describes the earth moving further away from the sun"
+                                 "|When the seasons change, for example: spring to summer"
+                                 "|Describes how the planets climates change over a long period of time ",
+                         correct_choice=3)
 
     question6 = Question(quiz_id=2,
-                         question_text="Choose the Odd number",
-                         choices="8|2|3|4",
-                         correct_choice=2)
+                         question_text="What is Global Warming?",
+                         choices="Describes the change in the Earth's average temperature over a long period of time"
+                                 "|Describes the increase in the number of clouds around the world"
+                                 "|The cooling of the Earth and increase of rainfall"
+                                 "|Describes the increase in human body temperature over time",
+                         correct_choice=0)
 
     question7 = Question(quiz_id=2,
-                         question_text="Choose the fish",
-                         choices="dog|not fish|not fish|fish",
-                         correct_choice=3)
+                         question_text="Which of these is not a greenhouse gas?",
+                         choices="Water Vapour"
+                                 "|Acid"
+                                 "|Carbon Dioxide"
+                                 "|Methane",
+                         correct_choice=1)
 
     question8 = Question(quiz_id=2,
-                         question_text="Pick Home",
-                         choices="House|House|House|Home",
-                         correct_choice=3)
+                         question_text="Why is it important that the levels of greenhouse gases in our atmosphere "
+                                       "remain roughly the same?",
+                         choices="So that we can breath more easily"
+                                 "|To maintain a stable climate"
+                                 "|To help keep us cool"
+                                 "|To keep the sky blue",
+                         correct_choice=1)
 
     question9 = Question(quiz_id=2,
-                         question_text="Black is the correct choice here",
-                         choices="Black|Blue|Green|Yellow",
+                         question_text="What is causing the sharp rise in carbon dioxide levels in our "
+                                       "atmosphere today?",
+                         choices="The Earth's natural cycle"
+                                 "|Human actions such as burning fossil fuels, farming and deforestation"
+                                 "|Sun spots and volcanic activity"
+                                 "|The sun getting hotter",
                          correct_choice=0)
 
     key_stage1 = KeyStage(key_stage=1)
-    key_stage2 = KeyStage(key_stage=1)
+    key_stage2 = KeyStage(key_stage=2)
+
+    student_quiz_score0 = StudentQuizScores(quiz_id=1,
+                                            student_id=2,
+                                            score=80)
+
+    student_quiz_score1 = StudentQuizScores(quiz_id=2,
+                                            student_id=2,
+                                            score=60)
 
     db.session.add(teacher)
     db.session.commit()
@@ -246,6 +285,8 @@ def init_db():
     db.session.add(question9)
     db.session.add(key_stage1)
     db.session.add(key_stage2)
+    db.session.add(student_quiz_score0)
+    db.session.add(student_quiz_score1)
     group.teacher_id = teacher.id
 
     db.session.commit()
