@@ -1,14 +1,14 @@
 from datetime import timedelta
 from functools import wraps
 
-from flask import Flask, render_template, session
+from flask import Flask, render_template, session, url_for
 from flask_login import current_user, LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
 import logging
 
 # app configuration
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.config.from_object('config.DevelopmentConfig')
 
 # create database instance
