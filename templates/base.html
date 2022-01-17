@@ -55,7 +55,7 @@
 
                     <div class="dropdown-menu dropdown-menu-right">
                         <a class="dropdown-item" href="{{ url_for('users.account', _username=current_user.username) }}">Account</a>
-                        <a class="dropdown-item" href="{{ url_for('users.change_password', _username=current_user.username) }}">Change Password</a>
+                        <a class="dropdown-item" href="{{ url_for('users.change_password') }}">Change Password</a>
                         <a class="dropdown-item" href="{{ url_for('users.join_group', _username=current_user.username) }}">Join A Group</a>
                     <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{{ url_for('users.logout') }}">Logout</a>
