@@ -1,18 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Educational Page {% endblock %}
+{% block title %}Climate 4 Kids | Quiz{% endblock %}
 {% block content %}
-<div>
-    <form method="POST">
-        {% for question in form.questions %}
-            <h5 class="card-title">{{ question.question_text.label }}</h5>
-            {% for error in question.radio_field.errors %}
-                {{ error }}
-            {% endfor %}
-            {{ question.hidden_tag() }}
-            {{ question.radio_field }}
-        {% endfor %}
-        <p>{{ form.submit() }}</p>
-        {{ form.hidden_tag() }}
-    </form>
-</div>
+    <div class="card text-start shadow p-3 mb-5 bg-white rounded">
+     <div class="card mb-1">
+          <div class="card-body">
+            <ul>
+                <form method="POST">
+                    {% for question in form.questions %}
+                        <h5 class="card-title float-left">{{ question.question_text.label }}</h5>
+                        <br>
+                        <br>
+                        {% for error in question.radio_field.errors %}
+                            {{ error }}
+                        {% endfor %}
+                        {{ question.hidden_tag() }}
+                        {{ question.radio_field }}
+                    {% endfor %}
+                    <p>{{ form.submit() }}</p>
+                    {{ form.hidden_tag() }}
+                </form>
+            </ul>
+          </div>
+     </div>
+    </div>
 {% endblock %}

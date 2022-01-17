@@ -30,7 +30,6 @@ class User(db.Model, UserMixin):
         self.registered_on = registered_on
 
 
-# NOTE: group_id is used by both student and teacher and could be made a user property instead
 class Student(User):
     __tablename__ = "student"
     id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
@@ -45,8 +44,7 @@ class Student(User):
         self.group_id = group_id
 
 
-#  Decryption of group codes considered, decided it was unnecessary,
-#   however implementation in future is still possible.
+#  Decryption of group codes considered, decided it was unnecessary however, implementation in future is still possible.
 class Teacher(User):
     __tablename__ = 'teacher'
     # foreign keys show one to one relationship

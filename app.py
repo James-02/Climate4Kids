@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from datetime import timedelta
 from functools import wraps
 
@@ -8,7 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 import logging
 
 # app configuration
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.config.from_object('config.DevelopmentConfig')
 
 # create database instance
@@ -18,6 +21,8 @@ print(db)
 
 @app.before_request
 def before_request():
+    """ A function to set the permanent session lifetime to 30 minutes before every request
+    """
     session.permanent = True
     app.permanent_session_lifetime = timedelta(minutes=30)
     session.modified = True
@@ -28,7 +33,7 @@ def index():
     return render_template("index.html")
 
 
-# error pages
+# error pages to render upon error handling
 @app.errorhandler(400)
 def bad_request(_error):
     return render_template('errors/400.html'), 400
@@ -60,6 +65,7 @@ def page_forbidden(_error):
 
 
 def requires_roles(*roles):
+    """ Function using wraps annotation to check if the current_user has the role required."""
     def wrapper(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
@@ -72,13 +78,12 @@ def requires_roles(*roles):
 
 
 if __name__ == '__main__':
+    # Flask LoginManager instance attributes
     login_manager = LoginManager()
     login_manager.login_view = 'users.login'
     login_manager.refresh_view = 'users.login'
     login_manager.login_message_category = 'danger'
     login_manager.login_message = 'Session timed out, please login again.'
-
-    # login_manager.refresh_view = 'users.login'
     login_manager.init_app(app)
 
     from models import User

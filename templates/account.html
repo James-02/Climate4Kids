@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Account | {{ current_user.name }}{% endblock %}
+{% block title %}Climate 4 Kids | {{ current_user.name }}{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="../static/css/styles.css"/>
 {% if current_user.role == 'student' or current_user.role == 'teacher' %}
@@ -52,7 +52,7 @@
 </div>
 <div class="card text-center border-primary shadow p-3 mb-5 bg-white rounded">
         <div class="card mb-1">
-          <img src="../static/media/group_avatar.png" class="card-img-av" alt="Default Group Avatar" style="float:left;width:72px;height:73px;">
+          <img src="../static/media/group-avatar.png" class="card-img-av" alt="Default Group Avatar" style="float:left;width:72px;height:73px;">
           <div class="card-body">
             <h1 class="group-dashboard">Groups</h1>
           <br>

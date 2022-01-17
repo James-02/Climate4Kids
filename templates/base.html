@@ -8,12 +8,17 @@
     <title>{% block title %}{% endblock %}</title> <!-- Allows for dynamic titles -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <link rel="icon" type="image/ico" href="{{ url_for('static', filename='media/favicon.ico') }}" sizes="16x16">
 </head>
 
-<body style="font-family: 'Comic Sans MS', serif">
+<body style="font-size: 20px">
     <!-- NAVBAR CODE -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="/">Educational Website<span class="sr-only">(current)</span></a>
+        <a class="navbar-brand" href="/">
+            <img src="{{ url_for('static', filename='media/globe-blue.png') }}" alt="" class="icon"/>
+            <span class="logo-text"><img src="{{ url_for('static', filename='media/text-blue.png') }}" alt="" class="icon-text"/></span>
+            <span class="sr-only">(current)</span></a>
+
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -29,11 +34,10 @@
           <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('users.content') }}">Educational Content</a>
           </li>
-        {% endif %}
-
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('users.quizzes') }}">Quizzes</a>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('users.quizzes') }}">Quizzes</a>
           </li>
+        {% endif %}
 
         </ul>
           <!-- END OF LEFT SIDE OF NAVBAR LINKS -->
@@ -41,32 +45,33 @@
           <!-- RIGHT SIDE OF NAVBAR ACCOUNT LINK-->
 
       </div>
-        <span class="navbar-text">
+        <div class="navbar-text">
           {% if current_user.is_authenticated %}
               <div class="account-avatar">
-                <div class="btn-group">
-                    <img src="{{ url_for('static', filename='media/avatar.png') }}" class="img-av" alt="Default Avatar">
-                    <button type="button" class="btn dropdown-toggle shadow-none" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ current_user.name }}</button>
+                  <img src="{{ url_for('static', filename='media/avatar.png') }}" class="img-av" alt="Default Avatar">
+                  <button type="button" class="btn dropdown-toggle shadow-none" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      {{ current_user.name }}
+                    </button>
+
                     <div class="dropdown-menu dropdown-menu-right">
                         <a class="dropdown-item" href="{{ url_for('users.account', _username=current_user.username) }}">Account</a>
-                        <a class="dropdown-item" href="{{ url_for('users.change_password', _username=current_user.username) }}">Change Password</a>
+                        <a class="dropdown-item" href="{{ url_for('users.change_password') }}">Change Password</a>
                         <a class="dropdown-item" href="{{ url_for('users.join_group', _username=current_user.username) }}">Join A Group</a>
                     <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{{ url_for('users.logout') }}">Logout</a>
                     </div>
                 </div>
-              </div>
         {% else %}
                 <ul class="navbar-nav float-right" style="align-content: end">
                   <li class="nav-item">
-                      <a class="nav-link" href="{{ url_for('users.login') }}">Login</a>
+                      <a class="nav-link" style="" href="{{ url_for('users.login') }}">Login</a>
                   </li>
                   <li class="nav-item">
                       <a class="nav-link" href="{{ url_for('users.register') }}">Register</a>
                   </li>
               </ul>
           {% endif %}
-        </span>
+        </div>
     </nav>
     <!-- END NAVBAR CODE -->
 
