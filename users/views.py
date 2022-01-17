@@ -18,7 +18,7 @@ from werkzeug.security import check_password_hash
 from flask_navigation import Navigation
 
 from models import User, Student, Group, Teacher, Quiz, Question, StudentQuizScores
-from forms import CreateGroup, RegisterStudent, LoginForm, QuizForm
+from users.forms import CreateGroup, RegisterStudent, LoginForm, QuizForm
 from random import randint
 
 from app import db, app, requires_roles
