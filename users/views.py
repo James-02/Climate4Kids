@@ -99,7 +99,6 @@ def dashboard():
 @users.route('/account/<string:_username>', methods=['GET'])
 @login_required
 def account(_username):
-    # TODO: implement quizzes into account.html info once they are completed
     if current_user.role == 'student':
         student = Student.query.get(current_user.id)
         group = Group.query.get(student.group_id)
@@ -122,7 +121,6 @@ def account(_username):
 
 @users.route('/account/change_password', methods=['GET', 'POST'])
 @login_required
-# TODO: Implement password policy checks for new password (e.g. over 10 characters)
 def change_password():
     form = ChangePassword()
     if form.validate_on_submit():
@@ -199,19 +197,23 @@ def create_students(group_id):
     form = RegisterStudent()
     teacher = Teacher.query.get(current_user.id)
     if form.validate_on_submit():
+        # Takes the names and splits them by line
         names = list(filter(None, (form.names.data.strip().split("\r\n"))))
-        date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")  # Current time/date
         group = Group.query.get(group_id)
         students = int(Student.query.filter_by(group_id=group_id).count())
+        # Validates that there aren't too many students
         if students + len(names) > group.size:
             flash("Too many students for this group size, please consider increasing group size.", "danger")
             return render_template('groups/create_students.html', form=form, group_id=group_id)
 
+        # Makes file with the students name/passwords
         filename = f'{group.name}.csv'
         with open(filename, 'w', encoding='UTF8', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=['username', 'password'])
             writer.writeheader()
 
+            # Commits these students to the database
             for name in names:
                 username, password = generate_account(name)
                 student = Student(role="student", name=name, username=username, password=password,
@@ -221,7 +223,7 @@ def create_students(group_id):
                 writer.writerow({'username': username, 'password': password})
 
         if not send_student_data(group.name, filename, teacher.email):
-            flash(f"Unable to send CSV to {teacher.email}, please contact an admin for help.", "danger")
+            flash(f"Unable to send CSV to {teacher.email}, please contact help.Climate4kids@gmail.com", "danger")
         else:
             return redirect(url_for('users.group', group_id=group_id))
 
