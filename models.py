@@ -59,8 +59,8 @@ class Teacher(User):
     # mapping relationship
     __mapper_args__ = {'polymorphic_identity': 'teacher'}
 
-    def __init__(self, user_type, name, username, password, last_login, registered_on, email):
-        super().__init__(user_type, name, username, password, last_login, registered_on)
+    def __init__(self, role, name, username, password, last_login, registered_on, email):
+        super().__init__(role, name, username, password, last_login, registered_on)
         self.email = email
 
 
@@ -158,7 +158,6 @@ def init_db():
                   size=30,
                   teacher_id=teacher.id,
                   key_stage=1)
-
 
     student = Student(role="student",
                       name="James Newsome",
