@@ -1,22 +1,10 @@
-## 'Climate 4 Kids' Flask Web Application
+## Climate 4 Kids Flask Web Application
 
 To run the Flask server with the terminal:
-- cd into the directory
+- run `cd Stage2-Team-Project`
 - run `pip install -r requirements.txt`
 - On Windows systems run `python app.py` on Mac/Unix systems run `python3 app.py`
 - Go to `http://127.0.0.1:5000/` 
-
-
-# Python Library Requirements
-- Flask
-- flask_sqlalchemy
-- python-dotenv
-- pymysql
-- werkzeug
-- flask_wtf
-- wtforms
-- flask_login
-- flask_navigation
 
 
 # Important
