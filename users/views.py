@@ -128,7 +128,6 @@ def change_password():
     if form.validate_on_submit():
         # Gets the user
         user = User.query.filter_by(username=form.username.data).first()
-        print(user)
         # Checks if user entered correct current password
         if not user or not check_password_hash(user.password, form.current_password.data):
             flash("Incorrect current password. Please try again.")
