@@ -21,3 +21,6 @@ To run the Flask server with the terminal:
 
 # Important
 For full functionality register a teacher account with an accessible email and this way you are able to also access student accounts.
+
+# REPO
+https://github.com/HarryHamilton/Stage2-Team-Project
