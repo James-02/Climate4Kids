@@ -38,6 +38,9 @@ def register():
 
 @users.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Allows for users to login to the web application.
+    """
     # create login attribute if it doesnt exist
     if not session.get('logins'):
         session['logins'] = 0
@@ -99,6 +102,8 @@ def dashboard():
 @users.route('/account/<string:_username>', methods=['GET'])
 @login_required
 def account(_username):
+    """ Displays the correct account page depending on the user
+    """
     if current_user.role == 'student':
         student = Student.query.get(current_user.id)
         group = Group.query.get(student.group_id)
@@ -194,6 +199,9 @@ def create_group():
 @login_required
 @requires_roles('teacher')
 def create_students(group_id):
+    """Allows for teachers to create student accounts, then will send the details to the
+    teachers email address.
+    """
     form = RegisterStudent()
     teacher = Teacher.query.get(current_user.id)
     if form.validate_on_submit():
@@ -243,6 +251,8 @@ def delete_group(group_id):
 @login_required
 @requires_roles('teacher')
 def edit_group(group_id):
+    """Allows for teachers to edit group details.
+    """
     form = CreateGroup()
     group = Group.query.get(group_id)
     if form.validate_on_submit():
