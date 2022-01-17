@@ -12,9 +12,9 @@ from email.mime.text import MIMEText
 from datetime import datetime
 from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request, session
 from flask_login import login_user, current_user, login_required, logout_user
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from models import User, Student, Group, Teacher
-from users.forms import CreateGroup, RegisterStudent, LoginForm
+from users.forms import CreateGroup, RegisterStudent, LoginForm, ChangePassword
 from random import randint
 
 from app import db, app, requires_roles
@@ -45,7 +45,6 @@ def login():
     elif session.get('logins') > 3:
         flash('Exceeded 3 login attempts')
 
-
     # create login form object
     form = LoginForm()
 
@@ -69,12 +68,12 @@ def login():
         else:
             login_user(user, remember=False)
 
-        session['logins'] = 0 # reset login counter to 0 on a successful login
+        session['logins'] = 0  # reset login counter to 0 on a successful login
         date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         user.last_login = date
         db.session.commit()
         # redirect the user to the appropriate page for their role
-        if current_user.role == 'teacher':     # this may need changing
+        if current_user.role == 'teacher':  # this may need changing
             return redirect(url_for('users.dashboard'))
         else:
             return redirect(url_for('index'))
@@ -121,9 +120,32 @@ def account(_username):
     return render_template('account.html')
 
 
-@users.route('/account/<string:_username>/change_password')
-def change_password(_username):
-    return render_template('index.html')
+@users.route('/account/change_password', methods=['GET', 'POST'])
+@login_required
+# TODO: Implement password policy checks for new password (e.g. over 10 characters)
+def change_password():
+    form = ChangePassword()
+    if form.validate_on_submit():
+        # Gets the user
+        user = User.query.filter_by(username=form.username.data).first()
+        print(user)
+        # Checks if user entered correct current password
+        if not user or not check_password_hash(user.password, form.current_password.data):
+            flash("Incorrect current password. Please try again.")
+
+            return render_template('change_password.html', form=form)
+        # If user did enter correct current password, go ahead with password change:
+        user.password == form.new_password.data
+        db.session.add(user)
+        db.session.commit()
+
+        return render_template('index.html')
+
+    return render_template('change_password.html', form=form)
+
+
+def forgotten_password():
+    return render_template("index.html")
 
 
 @users.route('/account/<string:_username>/join_group')
@@ -338,7 +360,7 @@ def generate_account(name):
 
     return username, password
 
-  
+
 """  
 Useful explanation of querying with Inheritance: https://docs.sqlalchemy.org/en/14/orm/inheritance_loading.html
 """

@@ -23,7 +23,7 @@ class DevelopmentConfig(Config):
     """
     Development configuration
     """
-    SQLALCHEMY_DATABASE_URI = environ.get('SQLALCHEMY_DATABASE_URI')
+    SQLALCHEMY_DATABASE_URI = environ.get('SQLALCHEMY_DATABASE_URI_TEST')
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
     FLASK_ENV = 'development'
@@ -35,7 +35,7 @@ class ProductionConfig(Config):
     """
     Production configuration
     """
-    SQLALCHEMY_DATABASE_URI = environ.get('SQLALCHEMY_DATABASE_URI')
+    SQLALCHEMY_DATABASE_URI = environ.get('SQLALCHEMY_DATABASE_URI_TEST')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     FLASK_ENV = 'production'

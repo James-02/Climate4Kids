@@ -111,6 +111,14 @@ def init_db():
                       registered_on="19/12/2021 00:55:11",
                       email="diversitycontracters1@gmail.com")
 
+    teacher2 = Teacher(role="teacher",
+                      name="Adam Smith2",
+                      username="AdamSmith34122",
+                      password="Testing123",
+                      last_login=None,
+                      registered_on="19/12/2021 00:55:12",
+                      email="diversitycontracters12@gmail.com")
+
     group = Group(id="453153",
                   name="Class 4",
                   size=30,
@@ -131,6 +139,9 @@ def init_db():
     db.session.commit()
     db.session.add(student)
     db.session.commit()
+    db.session.add(teacher2)
+    db.session.commit()
+
 
     group.teacher_id = teacher.id
     db.session.commit()
