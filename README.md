@@ -3,7 +3,7 @@
 To run the Flask server with the terminal:
 - cd into the directory
 - run `pip install -r requirements.txt`
-- run `python app.py`
+- On Windows systems run `python app.py` on Mac/Unix systems run `python3 app.py`
 - Go to `http://127.0.0.1:5000/` 
 
 
