@@ -1,3 +1,39 @@
+/*.navbar {*/
+/*    color: #63FF6C;*/
+/*}*/
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300&display=swap');
+.navbar {
+    position: relative;
+    align-items: center;
+    vertical-align: middle;
+    height: 10%;
+}
+.navbar-brand {
+    position: relative;
+    width: 10%;
+    left: 10px;
+
+    }
+    .icon {
+        float: left;
+        position: center;
+        width: 45px;
+        height: 45px;
+    }
+    .icon-text {
+        float: left;
+        position: center;
+        width: 60px;
+        height: 50px;
+    }
+    .logo-text {
+        position: absolute;
+        padding: 4px;
+    }
+.nav-item {
+    padding: 5px;
+    bottom: 10px;
+}
 .card {
         position: relative;
     }
@@ -6,21 +42,31 @@
         top: 5px;
         left: 5px;
     }
-
+.navbar-text {
+    width: 14%;
+    height: auto;
+}
 .account-avatar {
+    display: flex;
+    align-items:center;
     position: relative;
     }
+
     .img-av {
         float: left;
-        position: center;
-        width: 43px;
-        height: 44px;
+        position: relative;
+        width: 40px;
+        height: 40px;
     }
 
     .nav-link {
         float: right;
         position: center;
         top: -20px;
+    }
+    .account-text {
+        position: absolute;
+        padding: 7px;
     }
 
     .nav-link:hover {
@@ -33,10 +79,10 @@ transition: all 0.1s linear;
 transform: scale(1.03); /* (103% zoom)*/
 }
 
-/*.btn:hover {*/
-/*    background-color: #3e8e41;*/
-/*    transition-duration: 0.3s;*/
-/*}*/
+.navbar-text:hover {
+transition: all 0.1s linear;
+transform: scale(1.03); /* (103% zoom)*/
+}
 
 footer {
 	position: fixed;
@@ -50,6 +96,7 @@ footer {
 }
 
 html, body {
+    font-family: 'Source Sans Pro', sans-serif;
   position: relative;
   margin: 0;
   border: 0;
@@ -59,13 +106,42 @@ html, body {
   overflow: hidden;
 }
 
+.home-img {
+    animation: fadeInAnimation ease 2s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+     }
+}
+
+.home-img {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 3px;
+    width: 35%;
+    height:35%;
+    transition: transform .2s;
+}
+
+.home-img:hover {
+    transform: scale(1.1);
+}
+
 .hero-body {
     height: 100%;
     overflow: auto;
     background-image: url('../media/background.jpg');
     background-repeat: no-repeat;
     background-size: cover;
-    background-color: lightblue;
+    background-color: #195699;
     background-attachment: fixed;
 }
 #card-button {
@@ -90,4 +166,56 @@ html, body {
     position:absolute;
     right: 160px;
     top: 15px;
+}
+
+.card-review-1 {
+    transition: transform .2s;
+    animation: fadeInAnimation ease 2s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    position: absolute;
+    top: 150px;
+    right: 30px;
+    width: 20rem;
+    border-radius: 5px;
+    background-color: #fff;
+    margin-top: 30px;
+    padding: 30px 60px;
+}
+    .card-review-2 {
+        transition: transform .2s;
+        animation: fadeInAnimation ease 2s;
+        animation-iteration-count: 1;
+        animation-fill-mode: forwards;
+        position: absolute;
+        top: 150px;
+        left: 30px;
+        width: 20rem;
+        border-radius: 5px;
+        background-color: #fff;
+        margin-top: 30px;
+        padding: 30px 60px;
+    }
+
+.star-active {
+    color: #FBC02D;
+    margin-top: 10px;
+    margin-bottom: 10px
+}
+
+.star-inactive {
+    color: #CFD8DC;
+    margin-top: 10px;
+    margin-bottom: 10px
+}
+
+.content {
+    font-size: 18px
+}
+
+.profile-pic {
+    width: 90px;
+    height: 90px;
+    border-radius: 100%;
+    margin-right: 30px
 }

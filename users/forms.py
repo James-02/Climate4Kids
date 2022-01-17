@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask import flash
-from wtforms import StringField, IntegerField, SubmitField, TextAreaField, PasswordField
+from wtforms import StringField, IntegerField, SubmitField, TextAreaField, PasswordField, FormField, RadioField, FieldList
 from wtforms.validators import DataRequired, InputRequired, ValidationError, NumberRange, equal_to, Length
 
 
@@ -39,4 +39,14 @@ class ChangePassword(FlaskForm):
                                                                                             "99 characters.")])
     confirm_new_password = PasswordField(
         validators=[DataRequired(), equal_to('new_password', message="Passwords must match")])
+    submit = SubmitField()
+    
+    
+class QuizQuestionForm(FlaskForm):
+    question_text = StringField("")
+    radio_field = RadioField(validators=[DataRequired()])
+
+
+class QuizForm(FlaskForm):
+    questions = FieldList(FormField(QuizQuestionForm), min_entries=5)
     submit = SubmitField()

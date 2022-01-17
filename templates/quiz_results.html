@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Climate 4 Kids | Quiz{% endblock %}
+{% block content %}
+<div class="card text-center shadow p-3 mb-5 bg-blue rounded">
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Quiz Complete</h5>
+            <p class="card-text">
+                Score: {{ quiz_score }}%
+            </p>
+          </div>
+        </div>
+</div>
+{% endblock %}
