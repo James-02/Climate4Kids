@@ -18,7 +18,7 @@ from werkzeug.security import check_password_hash
 from flask_navigation import Navigation
 
 from models import User, Student, Group, Teacher, Quiz, Question, StudentQuizScores
-from forms import CreateGroup, RegisterStudent, LoginForm, QuizForm
+from users.forms import CreateGroup, RegisterStudent, LoginForm, QuizForm
 from random import randint
 
 from app import db, app, requires_roles
@@ -64,8 +64,8 @@ def login():
         user.last_login = date
         db.session.commit()
         # redirect the user to the appropriate page for their role
-        if current_user.user_type == 'teacher':  # this may need changing
-            return redirect('templates/dashboard.html')
+        if current_user.role == 'teacher':  # this may need changing
+            return redirect(url_for('users.dashboard'))
         else:
             return redirect(url_for('index'))
 
@@ -112,11 +112,14 @@ def account(_username):
 
 
 @users.route('/account/<string:_username>/change_password')
+@login_required
 def change_password(_username):
     return render_template('index.html')
 
 
 @users.route('/account/<string:_username>/join_group')
+@login_required
+@requires_roles('student')
 def join_group(_username):
     return render_template('index.html')
 
@@ -129,10 +132,12 @@ def content():
 
 # Displays all the quizzes available to the current user
 @users.route('/quizzes', methods=['GET', 'POST'])
+@login_required
+@requires_roles('student')
 def quizzes():
     # displays all the quizzes available to the user, that is, quizzes under the same key stage as the user's group
     available_quizzes = []
-    for s, q, g in db.session.query(Student, Quiz, Group).filter(Student.id == 2,
+    for s, q, g in db.session.query(Student, Quiz, Group).filter(Student.id == current_user.id,
                                                                  Group.id == Student.group_id,
                                                                  Quiz.key_stage == Group.key_stage).all():
         available_quizzes.append((q.id, q.name))
@@ -148,10 +153,12 @@ def quizzes():
 
         nav.Bar('quiz_navbar', nav_items)
 
-        return render_template('quizzes.html')
+        return render_template('quizzes.html', current_user=current_user)
 
 
 @users.route('/quiz_questions/<int:quiz_id>', methods=['POST', 'GET'])
+@login_required
+@requires_roles('student')
 def quiz_questions(quiz_id):
     # Example
     # question = "Which of these is a Fish?"
@@ -189,7 +196,7 @@ def quiz_questions(quiz_id):
 
         # TODO: Update to use current_user to get the student_id
         # saves student's quiz score to database
-        quiz_score = StudentQuizScores(quiz_id=quiz_id, student_id=2, score=score)
+        quiz_score = StudentQuizScores(quiz_id=quiz_id,  student_id=current_user.id, score=score)
         db.session.add(quiz_score)
         db.session.commit()
 
@@ -221,6 +228,7 @@ def create_group():
         # while loop to check that the ID does not already exist
         while id_check:
             group_id = randint(111111, 999999)
+            id_check = Group.query.filter_by(id=group_id).first()
 
         else:
             group = Group(id=str(group_id), name=str(form.name.data), size=form.size.data,
@@ -399,8 +407,6 @@ def generate_account(name):
 
     return username, password
 
-  
-"""  
 
 # Useful explanation of querying with Inheritance: https://docs.sqlalchemy.org/en/14/orm/inheritance_loading.html
 

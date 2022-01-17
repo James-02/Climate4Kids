@@ -30,7 +30,6 @@ class User(db.Model, UserMixin):
         self.registered_on = registered_on
 
 
-# NOTE: group_id is used by both student and teacher and could be made a user property instead
 class Student(User):
     __tablename__ = "student"
     id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
@@ -45,8 +44,7 @@ class Student(User):
         self.group_id = group_id
 
 
-#  Decryption of group codes considered, decided it was unneccessary,
-#   however implementation in future is still possible.
+#  Decryption of group codes considered, decided it was unnecessary however, implementation in future is still possible.
 class Teacher(User):
     __tablename__ = 'teacher'
     # foreign keys show one to one relationship
@@ -59,8 +57,8 @@ class Teacher(User):
     # mapping relationship
     __mapper_args__ = {'polymorphic_identity': 'teacher'}
 
-    def __init__(self, user_type, name, username, password, last_login, registered_on, email):
-        super().__init__(user_type, name, username, password, last_login, registered_on)
+    def __init__(self, role, name, username, password, last_login, registered_on, email):
+        super().__init__(role, name, username, password, last_login, registered_on)
         self.email = email
 
 
@@ -158,7 +156,6 @@ def init_db():
                   size=30,
                   teacher_id=teacher.id,
                   key_stage=1)
-
 
     student = Student(role="student",
                       name="James Newsome",
