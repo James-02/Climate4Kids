@@ -9,13 +9,6 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
-from datetime import datetime
-from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request, session
-from flask_login import login_user, current_user, login_required, logout_user
-from werkzeug.security import check_password_hash, generate_password_hash
-from models import User, Student, Group, Teacher
-from users.forms import CreateGroup, RegisterForm, LoginForm, ChangePassword
 from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request, session
 from flask_login import login_user, current_user, login_required, logout_user
 from flask_navigation import Navigation
@@ -23,9 +16,7 @@ from wtforms.fields.core import Label
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from models import User, Student, Group, Teacher, Quiz, Question, StudentQuizScores
-from users.forms import CreateGroup, RegisterStudent, LoginForm, QuizForm, ChangePassword, ForgottenPassword
-from users.forms import CreateGroup, RegisterForm, LoginForm, QuizForm, ChangePassword
-
+from users.forms import CreateGroup, RegisterForm, LoginForm, QuizForm, ChangePassword, ForgottenPassword
 from random import randint
 from app import db, app, requires_roles
 
@@ -207,7 +198,6 @@ def forgotten_password():
             new_pass += words[randint(0, len(words) - 1)].replace("\n", "")
         new_pass += nums
         email_pas = new_pass
-        print(email_pas)
         # Generates hash for new password and commits to the DB
         new_pass = generate_password_hash(new_pass)
         user.password = new_pass
