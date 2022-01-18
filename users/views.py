@@ -23,7 +23,7 @@ from wtforms.fields.core import Label
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from models import User, Student, Group, Teacher, Quiz, Question, StudentQuizScores
-from users.forms import CreateGroup, RegisterStudent, LoginForm, QuizForm, ChangePassword
+from users.forms import CreateGroup, RegisterStudent, LoginForm, QuizForm, ChangePassword, ForgottenPassword
 
 from random import randint
 from app import db, app, requires_roles
@@ -156,8 +156,40 @@ def change_password():
     return render_template('change_password.html', form=form)
 
 
+@users.route('/forgotten_password', methods=['GET', 'POST'])
 def forgotten_password():
-    return render_template("index.html")
+    form = ForgottenPassword()
+    if form.validate_on_submit():
+        print("test")
+        # Gets the user
+        user = User.query.filter_by(username=form.username.data).first()
+        # Checks if user entered correct current password
+        if not user:
+            print("test3")
+            flash("That account does not exist.", "danger")
+            return render_template('forgotten_password.html', form=form)
+
+        print("test4")
+        new_pass = ""
+        nums = str(randint(1111, 9999))
+        for _ in range(3):
+            new_pass += words[randint(0, len(words) - 1)].replace("\n", "")
+        new_pass += nums
+        print(new_pass)
+        new_pass = generate_password_hash(new_pass)
+        # If user did enter correct current password, go ahead with password change:
+        user.password = new_pass
+        print(user.password)
+        db.session.add(user)
+        user2 = User.query.filter_by(username=form.username.data).first()
+        print(user.password)
+        print(user2.password)
+        db.session.commit()
+
+        return render_template('index.html')
+    print("test2")
+    return render_template('forgotten_password.html', form=form)
+
 
 
 @users.route('/account/<string:_username>/join_group')

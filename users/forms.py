@@ -50,3 +50,8 @@ class QuizQuestionForm(FlaskForm):
 class QuizForm(FlaskForm):
     questions = FieldList(FormField(QuizQuestionForm), min_entries=5)
     submit = SubmitField()
+
+
+class ForgottenPassword(FlaskForm):
+    username = StringField(validators=[DataRequired(), name_check])
+    submit = SubmitField()
