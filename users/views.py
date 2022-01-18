@@ -150,15 +150,15 @@ def change_password():
         # If user did enter correct current password, go ahead with password change:
         new_pass = form.new_password.data
 
+        # Generate hash for new password
         new_pass = generate_password_hash(new_pass)
         # If user did enter correct current password, go ahead with password change:
         user.password = new_pass
-
-
         db.session.add(user)
         db.session.commit()
 
-        return render_template('index.html')
+        flash("Your password has been changed", "info")
+        return render_template('change_password.html', form=form)
     return render_template('change_password.html', form=form)
 
 
@@ -166,34 +166,27 @@ def change_password():
 def forgotten_password():
     form = ForgottenPassword()
     if form.validate_on_submit():
-        print("test")
         # Gets the user
         user = User.query.filter_by(username=form.username.data).first()
         # Checks if user entered correct current password
         if not user:
-            print("test3")
             flash("That account does not exist.", "danger")
             return render_template('forgotten_password.html', form=form)
 
-        print("test4")
         new_pass = ""
+        # Auto generates new password
         nums = str(randint(1111, 9999))
         for _ in range(3):
             new_pass += words[randint(0, len(words) - 1)].replace("\n", "")
         new_pass += nums
-        print(new_pass)
+        # Generates hash for new password and commits to the DB
         new_pass = generate_password_hash(new_pass)
-        # If user did enter correct current password, go ahead with password change:
         user.password = new_pass
-        print(user.password)
         db.session.add(user)
-        user2 = User.query.filter_by(username=form.username.data).first()
-        print(user.password)
-        print(user2.password)
         db.session.commit()
 
-        return render_template('index.html')
-    print("test2")
+        flash("Your new temporary password has been sent to your email.", "info")
+        return render_template('forgotten_password.html', form=form)
     return render_template('forgotten_password.html', form=form)
 
 
