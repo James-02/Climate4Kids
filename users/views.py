@@ -78,7 +78,7 @@ def register():
                                   email=form.email.data)
                 db.session.add(teacher)
                 db.session.commit()
-                return redirect(url_for('login', form=LoginForm()))
+                return login()
 
     return render_template('auth/register.html', form=form)
 
@@ -290,22 +290,17 @@ def forgotten_password():
 @users.route('/content', methods=['GET'])
 @login_required
 def content():
-    group = None
+    key_stage = 0
     if current_user.role == 'student':
         group_id = User.query.get(current_user.id).group_id
         group = Group.query.get(group_id)
-
-    elif current_user.role == 'teacher':
-        group = Group.query.filter_by(teacher_id=current_user.id).first()
-
-    print(group.key_stage)
-    return render_template('content.html', key_stage=int(group.key_stage))
+        key_stage = group.key_stage
+    return render_template('content.html', key_stage=int(key_stage))
 
 
 # Displays all the quizzes available to the current user
 @users.route('/quizzes', methods=['GET', 'POST'])
 @login_required
-@requires_roles('student')
 def quizzes():
     # displays all the quizzes available to the user, that is, quizzes under the same key stage as the user's group
     available_quizzes = []
@@ -330,7 +325,6 @@ def quizzes():
 
 @users.route('/quiz_questions/<int:quiz_id>', methods=['POST', 'GET'])
 @login_required
-@requires_roles('student')
 def quiz_questions(quiz_id):
     # Example
     # question = "Which of these is a Fish?"
@@ -629,8 +623,8 @@ def generate_account(name):
 
 def send_email(user, html):
     if user.role == 'student':
-        group = Group.query.get(User.group_id)
-        email = Teacher.get(group.teacher_id).email
+        group = Group.query.get(user.group_id)
+        email = Teacher.query.get(group.teacher_id).email
     else:
         email = user.email
 

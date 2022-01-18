@@ -2,7 +2,7 @@
 {% block title %}Climate 4 Kids | Content{% endblock %}
 {% block content %}
 
-{% if key_stage == 1 %}
+{% if key_stage == 1 or current_user.role == 'teacher' %}
     <div class="card text-center shadow p-3 mb-5 bg-white rounded">
         <div class="card mb-1">
           <img src="https://www.worldlandtrust.org/wp-content/uploads/2017/10/Santa-cruz-forest-banner.jpg" class="card-img-top" alt="A forest">
@@ -28,7 +28,7 @@
         </div>
 </div>
     {% endif %}
-{% if key_stage == 2 %}
+{% if key_stage == 2 or current_user.role == 'teacher' %}
     <div class="card text-center shadow p-3 mb-5 bg-white rounded">
         <div class="card mb-1">
           <img src="https://www.sparklebox.co.uk/wp-content/uploads/1-1080.jpg" class="card-img-top" alt="
