@@ -55,7 +55,7 @@ def login():
         session['logins'] = 0
     # display error if user has made 4+ invalid login attempts
     elif session.get('logins') > 3:
-        flash('Exceeded 3 login attempts')
+        flash('Exceeded 3 login attempts', "danger")
 
     # create login form object
     form = LoginForm()
@@ -70,7 +70,7 @@ def login():
         if not user or not check_password_hash(user.password, form.password.data):
             # flash a warning message and reload the page if credentials are invalid
             if session['logins'] > 3:
-                flash("Exceeded login attempts.")
+                flash("Exceeded login attempts.", "danger")
             flash('Incorrect Username or Password, please try again.', 'danger')
             return render_template('auth/login.html', form=form)
 
@@ -144,7 +144,7 @@ def change_password():
         user = User.query.filter_by(username=form.username.data).first()
         # Checks if user entered correct current password
         if not user or not check_password_hash(user.password, form.current_password.data):
-            flash("Incorrect current password. Please try again.")
+            flash("Incorrect current password. Please try again.", "danger")
 
             return render_template('change_password.html', form=form)
         # If user did enter correct current password, go ahead with password change:
