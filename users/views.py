@@ -181,14 +181,14 @@ def change_password():
         inputpass = re.compile(r'(?=.*[A-Z])(?=.*[*?!()^+%&/$#@<>=}{~£])(?=.*\d)')
         if not user or not check_password_hash(user.password, form.current_password.data):
             flash("Incorrect user or password. Please try again.", "danger")
-            return render_template('change_password.html', form=form)
+            return render_template('auth/change_password.html', form=form)
 
         elif not inputpass.match(form.new_password.data):
             flash("Password requires at least 1 digit, 1 uppercase letter and 1 special character.", 'danger')
 
         elif str(form.new_password.data) != str(form.confirm_new_password.data):
             flash("New passwords must match.", "danger")
-            return render_template('change_password.html', form=form)
+            return render_template('auth/change_password.html', form=form)
 
         # If user did enter correct current password, go ahead with password change:
         else:
@@ -200,7 +200,7 @@ def change_password():
             return redirect(url_for('users.login', form=LoginForm()))
         # Checks if user entered correct current password
 
-    return render_template('change_password.html', form=form)
+    return render_template('auth/change_password.html', form=form)
 
 
 @users.route('/forgotten_password', methods=['GET', 'POST'])
@@ -212,7 +212,7 @@ def forgotten_password():
         # Checks if user entered correct current password
         if not user:
             flash("That account does not exist.", "danger")
-            return render_template('forgotten_password.html', form=form)
+            return render_template('auth/forgotten_password.html', form=form)
 
         new_pass = ""
         # Auto generates new password
@@ -263,7 +263,7 @@ def forgotten_password():
 
         flash("Your new temporary password has been sent to your email.", "info")
         return redirect(url_for('users.login', form=LoginForm()))
-    return render_template('forgotten_password.html', form=form)
+    return render_template('auth/forgotten_password.html', form=form)
 
 
 # @users.route('/account/<string:_username>/join_group')
@@ -276,7 +276,16 @@ def forgotten_password():
 @users.route('/content', methods=['GET'])
 @login_required
 def content():
-    return render_template('content.html')
+    group = None
+    if current_user.role == 'student':
+        group_id = User.query.get(current_user.id).group_id
+        group = Group.query.get(group_id)
+
+    elif current_user.role == 'teacher':
+        group = Group.query.filter_by(teacher_id=current_user.id).first()
+
+    print(group.key_stage)
+    return render_template('content.html', key_stage=int(group.key_stage))
 
 
 # Displays all the quizzes available to the current user
@@ -302,7 +311,7 @@ def quizzes():
 
         nav.Bar('quiz_navbar', nav_items)
 
-        return render_template('quizzes.html', current_user=current_user)
+        return render_template('quizzes/quizzes.html', current_user=current_user)
 
 
 @users.route('/quiz_questions/<int:quiz_id>', methods=['POST', 'GET'])
@@ -348,8 +357,8 @@ def quiz_questions(quiz_id):
         db.session.add(quiz_score)
         db.session.commit()
 
-        return render_template('quiz_results.html', quiz_score=score)
-    return render_template('quiz_question.html', form=form)
+        return render_template('quizzes/quiz_results.html', quiz_score=score)
+    return render_template('quizzes/quiz_question.html', form=form)
 
 
 @users.route('/groups/<string:group_id>', methods=['GET'])

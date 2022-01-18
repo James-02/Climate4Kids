@@ -2,8 +2,8 @@
 {% block title %}Climate 4 Kids | Content{% endblock %}
 {% block content %}
 
-{#    {% if current_user.key_stage == 1 %} FIND A WAY TO GET THE CURRENT_USER's KEY_STAGE#}
-<div class="card text-center shadow p-3 mb-5 bg-white rounded">
+{% if key_stage == 1 %}
+    <div class="card text-center shadow p-3 mb-5 bg-white rounded">
         <div class="card mb-1">
           <img src="https://www.worldlandtrust.org/wp-content/uploads/2017/10/Santa-cruz-forest-banner.jpg" class="card-img-top" alt="A forest">
           <div class="card-body" style="font-family: 'Comic Sans MS', serif">
@@ -27,8 +27,8 @@
           </div>
         </div>
 </div>
-{#    {% endif %}#}
-
+    {% endif %}
+{% if key_stage == 2 %}
     <div class="card text-center shadow p-3 mb-5 bg-white rounded">
         <div class="card mb-1">
           <img src="https://www.sparklebox.co.uk/wp-content/uploads/1-1080.jpg" class="card-img-top" alt="
@@ -61,4 +61,5 @@ Banner saying 'climate change' with a sun, clouds and thermometer behind it.">
           </div>
         </div>
 </div>
+    {% endif %}
 {% endblock %}
