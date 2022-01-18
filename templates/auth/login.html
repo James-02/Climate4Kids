@@ -31,17 +31,20 @@
                 </div>
 
                 <div class="form-group col mb-6">
-                    <div class="form-check float-left">
+                    <div class="login-form-end form-check float-left">
                         <input type="checkbox" class="form-check-input" id="remember" name="remember_me">
                         <label class="form-check-label" for="remember">
                             Remember me
                         </label>
-                </div>
+                        <div style="width: 110px;"></div>
+                        <div class="forgotten-password" style="justify-content: end; padding: 2px;">
+                            <a class="nav-link" href="{{ url_for('users.forgotten_password') }}">Forgotten Password</a>
+                        </div>
+                        </div>
                     <div class="form-group col mb-6 float-left">
                         {{ form.submit(class_="btn btn-success is-centered") }}
                     </div>
                 </div>
-
             </form>
         {% endif %}
             </div>

@@ -3,6 +3,7 @@
 import csv
 import logging
 import os
+import re
 import smtplib
 
 from email import encoders
@@ -10,20 +11,15 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from datetime import datetime
-from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request, session
-from flask_login import login_user, current_user, login_required, logout_user
-from werkzeug.security import check_password_hash, generate_password_hash
-from models import User, Student, Group, Teacher
-from users.forms import CreateGroup, RegisterStudent, LoginForm, ChangePassword
 from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request, session
 from flask_login import login_user, current_user, login_required, logout_user
 from flask_navigation import Navigation
 from wtforms.fields.core import Label
 from werkzeug.security import check_password_hash, generate_password_hash
-
+from datetime import datetime
 from models import User, Student, Group, Teacher, Quiz, Question, StudentQuizScores
-from users.forms import CreateGroup, RegisterStudent, LoginForm, QuizForm, ChangePassword
+from users.forms import CreateGroup, RegisterForm, LoginForm, QuizForm, ChangePassword, ForgottenPassword, \
+    RegisterStudent
 
 from random import randint
 from app import db, app, requires_roles
@@ -42,7 +38,43 @@ with open("static/dict.txt", "r") as r:
 # VIEWS
 @users.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template('auth/register.html')
+    # Created register form
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+        # Checks if the username entered already exists in the database
+        user = User.query.filter_by(username=form.username.data).first()
+        email = Teacher.query.filter_by(email=form.email.data).first()
+
+        if user:
+            # If the username exists, an error is flashed and the page is reloaded
+            flash('Sorry, this username already exists.', 'danger')
+            return render_template('auth/register.html', form=form)
+
+        elif email:
+            # If the email is being used, an error is flashed and the page is reloaded
+            flash('Sorry, this email is already in use.', 'danger')
+            return render_template('auth/register.html', form=form)
+
+        elif str(form.password.data) != str(form.repeatpassword.data):
+            # If the passwords are not equal, an error is flashed and the page is reloaded
+            flash('Passwords must match.', 'danger')
+            return render_template('auth/register.html', form=form)
+
+        else:
+            # If the username doesn't already exist, an account is created with the information the user input
+            teacher = Teacher(role="teacher",
+                              name=form.fullname.data,
+                              username=form.username.data,
+                              password=form.password.data,
+                              last_login=None,
+                              registered_on=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                              email=form.email.data)
+            db.session.add(teacher)
+            db.session.commit()
+            return login()
+
+    return render_template('auth/register.html', form=form)
 
 
 @users.route('/login', methods=['GET', 'POST'])
@@ -55,7 +87,7 @@ def login():
         session['logins'] = 0
     # display error if user has made 4+ invalid login attempts
     elif session.get('logins') > 3:
-        flash('Exceeded 3 login attempts')
+        flash('Exceeded 3 login attempts', "danger")
 
     # create login form object
     form = LoginForm()
@@ -70,7 +102,7 @@ def login():
         if not user or not check_password_hash(user.password, form.password.data):
             # flash a warning message and reload the page if credentials are invalid
             if session['logins'] > 3:
-                flash("Exceeded login attempts.")
+                flash("Exceeded login attempts.", "danger")
             flash('Incorrect Username or Password, please try again.', 'danger')
             return render_template('auth/login.html', form=form)
 
@@ -118,12 +150,16 @@ def account(_username):
         group = Group.query.get(student.group_id)
         teacher = None
         students = None
+        group_average_quiz_score = None
         if group is not None:
             students = len(group.students)
             teacher = Teacher.query.get(group.teacher_id)
+            group_average_quiz_score = get_group_average_quiz_score(group.id)
+
         average_quiz_score, quizzes_completed = get_student_average_quiz_score(current_user.id)
         return render_template('account.html', group=group, teacher=teacher, students=students,
-                               average_quiz_score=average_quiz_score, quizzes_completed=quizzes_completed)
+                               average_quiz_score=average_quiz_score, quizzes_completed=quizzes_completed,
+                               group_average_quiz_score=group_average_quiz_score)
 
     if current_user.role == 'teacher':
         groups = Group.query.filter_by(teacher_id=current_user.id).all()
@@ -142,29 +178,99 @@ def change_password():
     if form.validate_on_submit():
         # Gets the user
         user = User.query.filter_by(username=form.username.data).first()
-        # Checks if user entered correct current password
+        inputpass = re.compile(r'(?=.*[A-Z])(?=.*[*?!()^+%&/$#@<>=}{~£])(?=.*\d)')
         if not user or not check_password_hash(user.password, form.current_password.data):
-            flash("Incorrect current password. Please try again.")
-
+            flash("Incorrect user or password. Please try again.", "danger")
             return render_template('change_password.html', form=form)
-        # If user did enter correct current password, go ahead with password change:
-        user.password = form.new_password.data
-        db.session.add(user)
-        db.session.commit()
 
-        return render_template('index.html')
+        elif not inputpass.match(form.new_password.data):
+            flash("Password requires at least 1 digit, 1 uppercase letter and 1 special character.", 'danger')
+
+        elif str(form.new_password.data) != str(form.confirm_new_password.data):
+            flash("New passwords must match.", "danger")
+            return render_template('change_password.html', form=form)
+
+        # If user did enter correct current password, go ahead with password change:
+        else:
+            user.password = generate_password_hash(form.new_password.data)
+            db.session.commit()
+
+            flash("Your password has been changed", "info")
+            logout_user()
+            return redirect(url_for('users.login', form=LoginForm()))
+        # Checks if user entered correct current password
+
     return render_template('change_password.html', form=form)
 
 
+@users.route('/forgotten_password', methods=['GET', 'POST'])
 def forgotten_password():
-    return render_template("index.html")
+    form = ForgottenPassword()
+    if form.validate_on_submit():
+        # Gets the user
+        user = User.query.filter_by(username=form.username.data).first()
+        # Checks if user entered correct current password
+        if not user:
+            flash("That account does not exist.", "danger")
+            return render_template('forgotten_password.html', form=form)
+
+        new_pass = ""
+        # Auto generates new password
+        nums = str(randint(1111, 9999))
+        for _ in range(3):
+            new_pass += words[randint(0, len(words) - 1)].replace("\n", "")
+        new_pass += nums
+        # Generates hash for new password and commits to the DB
+        user.password = generate_password_hash(new_pass)
+        db.session.commit()
+
+        if User.role == 'student':
+            group = Group.query.get(User.group_id)
+            email = Teacher.get(group.teacher_id).email
+        else:
+            email = user.email
+        # Sends email to the teacher with their new password
+        message = MIMEMultipart()
+        message["Subject"] = f"{user.name} password reset"
+        message["From"] = SMTP_EMAIL
+        message["To"] = email
+
+        html = f"""\
+            <html>
+              <head></head>
+              <body>
+                <p><b>Hello {user.name}. Your new password is {new_pass}</b></p>
+                <br>
+                <br>
+                <p>We urge you to change the password as soon as possible.</p>
+              </body>
+              <br>
+              <footer style="position:center">
+              <b>Climate4Kids
+              <br>
+              <br>
+              <i>For a better education to the next generation</i>
+              </b>
+              </footer>
+            </html>
+            """
+        message.attach(MIMEText(html, "html"))
+        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        smtp_server.ehlo()
+        smtp_server.login(SMTP_EMAIL, SMTP_PASSWORD)
+        smtp_server.sendmail(SMTP_EMAIL, email, message.as_string())
+        smtp_server.close()
+
+        flash("Your new temporary password has been sent to your email.", "info")
+        return redirect(url_for('users.login', form=LoginForm()))
+    return render_template('forgotten_password.html', form=form)
 
 
-@users.route('/account/<string:_username>/join_group')
-@login_required
-@requires_roles('student')
-def join_group(_username):
-    return render_template('index.html')
+# @users.route('/account/<string:_username>/join_group')
+# @login_required
+# @requires_roles('student')
+# def join_group(_username):
+#     return render_template('index.html')
 
 
 @users.route('/content', methods=['GET'])
@@ -243,7 +349,6 @@ def quiz_questions(quiz_id):
         db.session.commit()
 
         return render_template('quiz_results.html', quiz_score=score)
-
     return render_template('quiz_question.html', form=form)
 
 
@@ -271,7 +376,6 @@ def get_student_average_quiz_score(student_id):
     student_quiz_scores = StudentQuizScores.query.filter_by(student_id=student_id).all()
 
     num_of_quizzes = len(student_quiz_scores)
-    num_of_quizzes = 0
     if num_of_quizzes == 0:
         return 0, 0
     else:
@@ -280,6 +384,23 @@ def get_student_average_quiz_score(student_id):
             sum_of_all_scores += quiz_score.score
 
         return sum_of_all_scores / num_of_quizzes, num_of_quizzes
+
+
+# returns the average score of quizzes completed specified group
+def get_group_average_quiz_score(group_id):
+    sum_of_all_scores = 0
+    num_of_scores = 0
+    for g, sqs, q in db.session.query(Group, StudentQuizScores, Quiz).filter(
+            Group.id == group_id,
+            Group.key_stage == Quiz.key_stage,
+            Quiz.id == StudentQuizScores.quiz_id).all():
+        sum_of_all_scores += sqs.score
+        num_of_scores += 1
+
+    if num_of_scores == 0:
+        return 0
+    else:
+        return sum_of_all_scores / num_of_scores
 
 
 @users.route('/groups/create_group', methods=['GET', 'POST'])
@@ -486,4 +607,5 @@ def generate_account(name):
 """  
 Useful explanation of querying with Inheritance: https://docs.sqlalchemy.org/en/14/orm/inheritance_loading.html
 """
+
 

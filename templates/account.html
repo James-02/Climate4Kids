@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Climate 4 Kids | {{ current_user.name }}{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="../static/css/styles.css"/>
 {% if current_user.role == 'student' or current_user.role == 'teacher' %}
 <div class="card text-center border-primary shadow p-3 mb-5 bg-white rounded">
     <div class="card mb-1">
@@ -23,8 +22,8 @@
                     <td>{{ current_user.username }}</td>
                     <td>{{ current_user.registered_on }}</td>
                     <td>{{ current_user.last_login }}</td>
-                    <td>None</td>
-                    <td>None</td>
+                    <td>{{ quizzes_completed }}</td>
+                    <td>{{ average_quiz_score }}</td>
                 </tr>
             </tbody>
           {% endif %}
@@ -74,7 +73,7 @@
                               <td>{{ teacher.name }}</td>
                               <td>{{ group.students|length }}</td>
                               <td>{{ group.key_stage }}</td>
-                              <td>None</td>
+                              <td>{{ group_average_quiz_score }}</td>
                           </tr>
                       {% endfor %}
                   {% endif %}
@@ -85,7 +84,7 @@
                           <td>{{ teacher.name }}</td>
                           <td>{{ students }}</td>
                           <td>{{ group.key_stage }}</td>
-                          <td>None</td>
+                          <td>{{ group_average_quiz_score }}</td>
                       </tr>
                       </tbody>
                   {% endif %}

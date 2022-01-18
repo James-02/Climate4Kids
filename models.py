@@ -170,7 +170,7 @@ def init_db():
 
     question0 = Question(quiz_id=1,
                          question_text="What is Weather?",
-                         choices="If's it's raining or not"
+                         choices="If it's raining or not"
                                  "|The daily conditions in a small area"
                                  "|The average temperature"
                                  "|The number of clouds in the sky",
@@ -197,7 +197,7 @@ def init_db():
                          choices="Cold with lots of snowfall"
                                  "|Hot and lots of rainfall"
                                  "|Cold and windy"
-                                 "|Very hot and dry all",
+                                 "|Very hot and dry all year",
                          correct_choice=3)
 
     question4 = Question(quiz_id=1,

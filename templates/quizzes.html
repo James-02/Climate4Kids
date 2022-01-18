@@ -1,7 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Climate 4 Kids | Quizzes{% endblock %}
-{% block content %}
-<ul>
+{% block content %}<style>
+a:link {
+  color: yellow;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: yellow;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:hover {
+  color: yellow;
+  background-color: transparent;
+  text-decoration: underline;
+}
+</style>
+<ul style="font-family: 'Comic Sans MS', serif">
     {% for item in nav.quiz_navbar %}
     <li class="{{ 'active' if item.is_active else '' }}">
         <a href="{{ item.url }}">{{ item.label }}</a>
