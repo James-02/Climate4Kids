@@ -145,9 +145,11 @@ def account(_username):
         if group is not None:
             students = len(group.students)
             teacher = Teacher.query.get(group.teacher_id)
+            group_average_quiz_score = get_group_average_quiz_score(group.id)
         average_quiz_score, quizzes_completed = get_student_average_quiz_score(current_user.id)
         return render_template('account.html', group=group, teacher=teacher, students=students,
-                               average_quiz_score=average_quiz_score, quizzes_completed=quizzes_completed)
+                               average_quiz_score=average_quiz_score, quizzes_completed=quizzes_completed,
+                               group_average_quiz_score=group_average_quiz_score)
 
     if current_user.role == 'teacher':
         groups = Group.query.filter_by(teacher_id=current_user.id).all()
@@ -295,7 +297,6 @@ def get_student_average_quiz_score(student_id):
     student_quiz_scores = StudentQuizScores.query.filter_by(student_id=student_id).all()
 
     num_of_quizzes = len(student_quiz_scores)
-    num_of_quizzes = 0
     if num_of_quizzes == 0:
         return 0, 0
     else:
@@ -304,6 +305,23 @@ def get_student_average_quiz_score(student_id):
             sum_of_all_scores += quiz_score.score
 
         return sum_of_all_scores / num_of_quizzes, num_of_quizzes
+
+
+# returns the average score of quizzes completed specified group
+def get_group_average_quiz_score(group_id):
+    sum_of_all_scores = 0
+    num_of_scores = 0
+    for g, sqs, q in db.session.query(Group, StudentQuizScores, Quiz).filter(
+            Group.id == group_id,
+            Group.key_stage == Quiz.key_stage,
+            Quiz.id == StudentQuizScores.quiz_id).all():
+        sum_of_all_scores += sqs.score
+        num_of_scores += 1
+
+    if num_of_scores == 0:
+        return 0
+    else:
+        return sum_of_all_scores / num_of_scores
 
 
 @users.route('/groups/create_group', methods=['GET', 'POST'])
