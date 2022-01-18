@@ -4,8 +4,6 @@ import csv
 import logging
 import os
 import smtplib
-import socket
-import urllib
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -39,7 +37,7 @@ def register():
     form = RegisterForm()
 
     if form.validate_on_submit():
-        # Checks if the username entered alreay exists in the database
+        # Checks if the username entered already exists in the database
         user_exists = User.query.filter_by(username=form.username.data).first()
 
         if user_exists:
@@ -47,17 +45,30 @@ def register():
             flash('Sorry, this username already exists')
             return render_template('auth/register.html', form=form)
 
-        # If the username doesn't already exist, an account is created with the information the user input
-        teacher = Teacher(role="teacher",
-                          name=form.fullname.data,
-                          username=form.username.data,
-                          password=form.password.data,
-                          last_login=None,
-                          registered_on=datetime.now(),
-                          email=form.email.data)
-        db.session.add(teacher)
-        db.session.commit()
-        return login()
+        acuk = form.email.data[-6:]
+        edu = form.email.data[-4:]
+        schuk = form.email.data[-7:]
+        print(acuk)
+        print(edu)
+        print(schuk)
+
+        if form.email.data[-6:] == ".ac.uk" or form.email.data[-4:] == ".edu" or form.email.data[-7:] == ".sch.uk":
+            # If the username doesn't already exist, an account is created with the information the user input
+            teacher = Teacher(role="teacher",
+                              name=form.fullname.data,
+                              username=form.username.data,
+                              password=form.password.data,
+                              last_login=None,
+                              registered_on=datetime.now(),
+                              email=form.email.data)
+            db.session.add(teacher)
+            db.session.commit()
+            return login()
+        else:
+            flash("Sorry - we only accept emails ending in '.ac.uk', '.edu' or '.sch.uk'! "
+                  "If you are a teacher but don't have access to one of these email domains, "
+                  "please email us at 'help.Climate4kids@gmail.com'", "warning")
+            return render_template('auth/register.html', form=form)
 
     return render_template('auth/register.html', form=form)
 
