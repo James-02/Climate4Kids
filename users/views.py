@@ -62,17 +62,23 @@ def register():
             return render_template('auth/register.html', form=form)
 
         else:
-            # If the username doesn't already exist, an account is created with the information the user input
-            teacher = Teacher(role="teacher",
-                              name=form.fullname.data,
-                              username=form.username.data,
-                              password=form.password.data,
-                              last_login=None,
-                              registered_on=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-                              email=form.email.data)
-            db.session.add(teacher)
-            db.session.commit()
-            return login()
+            if form.email.data[-6:] == ".ac.uk" or form.email.data[-4:] == ".edu" or form.email.data[-7:] == ".sch.uk":
+                flash("Sorry - we only accept emails ending in '.ac.uk', '.edu' or '.sch.uk'! "
+                      "If you are a teacher but don't have access to one of these email domains, "
+                      "please email us at 'help.Climate4kids@gmail.com'", "warning")
+
+            else:
+                # If the username doesn't already exist, an account is created with the information the user input
+                teacher = Teacher(role="teacher",
+                                  name=form.fullname.data,
+                                  username=form.username.data,
+                                  password=form.password.data,
+                                  last_login=None,
+                                  registered_on=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                                  email=form.email.data)
+                db.session.add(teacher)
+                db.session.commit()
+                return redirect(url_for('login', form=LoginForm()))
 
     return render_template('auth/register.html', form=form)
 
@@ -197,6 +203,31 @@ def change_password():
 
             flash("Your password has been changed", "info")
             logout_user()
+            current_time = datetime.now().strftime("%H:%M:%S")
+            html = f"""\
+                    <html>
+                      <head></head>
+                      <body>
+                        <p><b>Hello {user.name}. </b></p>
+                        <br>
+                        <br>
+                        <p> Your password was recently changed.
+                        <br>
+                        <p> Time of change: {current_time}
+                        <br>
+                        <p>If this was not done by use, please change your website password immediately.</p>
+                      </body>
+                      <br>
+                      <footer style="position:center">
+                      <b>Climate4Kids
+                      <br>
+                      <br>
+                      <i>For a better education to the next generation</i>
+                      </b>
+                      </footer>
+                    </html>
+                    """
+            send_email(user, html)
             return redirect(url_for('users.login', form=LoginForm()))
         # Checks if user entered correct current password
 
@@ -223,18 +254,6 @@ def forgotten_password():
         # Generates hash for new password and commits to the DB
         user.password = generate_password_hash(new_pass)
         db.session.commit()
-
-        if User.role == 'student':
-            group = Group.query.get(User.group_id)
-            email = Teacher.get(group.teacher_id).email
-        else:
-            email = user.email
-        # Sends email to the teacher with their new password
-        message = MIMEMultipart()
-        message["Subject"] = f"{user.name} password reset"
-        message["From"] = SMTP_EMAIL
-        message["To"] = email
-
         html = f"""\
             <html>
               <head></head>
@@ -254,12 +273,7 @@ def forgotten_password():
               </footer>
             </html>
             """
-        message.attach(MIMEText(html, "html"))
-        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        smtp_server.ehlo()
-        smtp_server.login(SMTP_EMAIL, SMTP_PASSWORD)
-        smtp_server.sendmail(SMTP_EMAIL, email, message.as_string())
-        smtp_server.close()
+        send_email(user, html)
 
         flash("Your new temporary password has been sent to your email.", "info")
         return redirect(url_for('users.login', form=LoginForm()))
@@ -611,6 +625,25 @@ def generate_account(name):
     password += nums
 
     return username, password
+
+
+def send_email(user, html):
+    if user.role == 'student':
+        group = Group.query.get(User.group_id)
+        email = Teacher.get(group.teacher_id).email
+    else:
+        email = user.email
+
+    message = MIMEMultipart()
+    message["Subject"] = f"{user.name} password reset"
+    message["From"] = SMTP_EMAIL
+    message["To"] = email
+    message.attach(MIMEText(html, "html"))
+    smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    smtp_server.ehlo()
+    smtp_server.login(SMTP_EMAIL, SMTP_PASSWORD)
+    smtp_server.sendmail(SMTP_EMAIL, email, message.as_string())
+    smtp_server.close()
 
 
 """  
