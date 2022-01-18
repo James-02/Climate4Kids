@@ -148,7 +148,7 @@ def change_password():
 
             return render_template('change_password.html', form=form)
         # If user did enter correct current password, go ahead with password change:
-        user.password == form.new_password.data
+        user.password = form.new_password.data
         db.session.add(user)
         db.session.commit()
 
