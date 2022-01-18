@@ -15,15 +15,16 @@ from flask import flash, current_app, Blueprint, render_template, redirect, url_
 from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import User, Student, Group, Teacher
-from users.forms import CreateGroup, RegisterStudent, LoginForm, ChangePassword
+from users.forms import CreateGroup, RegisterForm, LoginForm, ChangePassword
 from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request, session
 from flask_login import login_user, current_user, login_required, logout_user
 from flask_navigation import Navigation
 from wtforms.fields.core import Label
 from werkzeug.security import check_password_hash, generate_password_hash
-
+from datetime import datetime
 from models import User, Student, Group, Teacher, Quiz, Question, StudentQuizScores
 from users.forms import CreateGroup, RegisterStudent, LoginForm, QuizForm, ChangePassword, ForgottenPassword
+from users.forms import CreateGroup, RegisterForm, LoginForm, QuizForm, ChangePassword
 
 from random import randint
 from app import db, app, requires_roles
@@ -42,7 +43,31 @@ with open("static/dict.txt", "r") as r:
 # VIEWS
 @users.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template('auth/register.html')
+    # Created register form
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+        # Checks if the username entered alreay exists in the database
+        user_exists = User.query.filter_by(username=form.username.data).first()
+
+        if user_exists:
+            # If the username exists, an error is flashed and the page is reloaded
+            flash('Sorry, this username already exists')
+            return render_template('auth/register.html', form=form)
+
+        # If the username doesn't already exist, an account is created with the information the user input
+        teacher = Teacher(role="teacher",
+                          name=form.fullname.data,
+                          username=form.username.data,
+                          password=form.password.data,
+                          last_login=None,
+                          registered_on=datetime.now(),
+                          email=form.email.data)
+        db.session.add(teacher)
+        db.session.commit()
+        return login()
+
+    return render_template('auth/register.html', form=form)
 
 
 @users.route('/login', methods=['GET', 'POST'])
@@ -121,9 +146,11 @@ def account(_username):
         if group is not None:
             students = len(group.students)
             teacher = Teacher.query.get(group.teacher_id)
+            group_average_quiz_score = get_group_average_quiz_score(group.id)
         average_quiz_score, quizzes_completed = get_student_average_quiz_score(current_user.id)
         return render_template('account.html', group=group, teacher=teacher, students=students,
-                               average_quiz_score=average_quiz_score, quizzes_completed=quizzes_completed)
+                               average_quiz_score=average_quiz_score, quizzes_completed=quizzes_completed,
+                               group_average_quiz_score=group_average_quiz_score)
 
     if current_user.role == 'teacher':
         groups = Group.query.filter_by(teacher_id=current_user.id).all()
@@ -337,7 +364,6 @@ def get_student_average_quiz_score(student_id):
     student_quiz_scores = StudentQuizScores.query.filter_by(student_id=student_id).all()
 
     num_of_quizzes = len(student_quiz_scores)
-    num_of_quizzes = 0
     if num_of_quizzes == 0:
         return 0, 0
     else:
@@ -346,6 +372,23 @@ def get_student_average_quiz_score(student_id):
             sum_of_all_scores += quiz_score.score
 
         return sum_of_all_scores / num_of_quizzes, num_of_quizzes
+
+
+# returns the average score of quizzes completed specified group
+def get_group_average_quiz_score(group_id):
+    sum_of_all_scores = 0
+    num_of_scores = 0
+    for g, sqs, q in db.session.query(Group, StudentQuizScores, Quiz).filter(
+            Group.id == group_id,
+            Group.key_stage == Quiz.key_stage,
+            Quiz.id == StudentQuizScores.quiz_id).all():
+        sum_of_all_scores += sqs.score
+        num_of_scores += 1
+
+    if num_of_scores == 0:
+        return 0
+    else:
+        return sum_of_all_scores / num_of_scores
 
 
 @users.route('/groups/create_group', methods=['GET', 'POST'])
@@ -552,4 +595,5 @@ def generate_account(name):
 """  
 Useful explanation of querying with Inheritance: https://docs.sqlalchemy.org/en/14/orm/inheritance_loading.html
 """
+
 
