@@ -7,3 +7,4 @@ flask_wtf
 wtforms
 flask_login
 flask_navigation
+email-validator==1.1.3
