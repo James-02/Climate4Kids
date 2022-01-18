@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Climate 4 Kids | {{ current_user.name }}{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="../static/css/styles.css"/>
 {% if current_user.role == 'student' or current_user.role == 'teacher' %}
 <div class="card text-center border-primary shadow p-3 mb-5 bg-white rounded">
     <div class="card mb-1">

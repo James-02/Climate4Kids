@@ -3,11 +3,14 @@
 import csv
 import logging
 import os
+import re
 import smtplib
+
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
 from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request, session
 from flask_login import login_user, current_user, login_required, logout_user
 from flask_navigation import Navigation
@@ -15,7 +18,9 @@ from wtforms.fields.core import Label
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from models import User, Student, Group, Teacher, Quiz, Question, StudentQuizScores
-from users.forms import CreateGroup, RegisterForm, LoginForm, QuizForm, ChangePassword, ForgottenPassword
+from users.forms import CreateGroup, RegisterForm, LoginForm, QuizForm, ChangePassword, ForgottenPassword, \
+    RegisterStudent
+
 from random import randint
 from app import db, app, requires_roles
 
@@ -38,30 +43,42 @@ def register():
 
     if form.validate_on_submit():
         # Checks if the username entered already exists in the database
-        user_exists = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(username=form.username.data).first()
+        email = Teacher.query.filter_by(email=form.email.data).first()
 
-        if user_exists:
+        if user:
             # If the username exists, an error is flashed and the page is reloaded
-            flash('Sorry, this username already exists')
+            flash('Sorry, this username already exists.', 'danger')
             return render_template('auth/register.html', form=form)
 
-        if form.email.data[-6:] == ".ac.uk" or form.email.data[-4:] == ".edu" or form.email.data[-7:] == ".sch.uk":
-            # If the username doesn't already exist, an account is created with the information the user input
-            teacher = Teacher(role="teacher",
-                              name=form.fullname.data,
-                              username=form.username.data,
-                              password=form.password.data,
-                              last_login=None,
-                              registered_on=datetime.now(),
-                              email=form.email.data)
-            db.session.add(teacher)
-            db.session.commit()
-            return login()
-        else:
-            flash("Sorry - we only accept emails ending in '.ac.uk', '.edu' or '.sch.uk'! "
-                  "If you are a teacher but don't have access to one of these email domains, "
-                  "please email us at 'help.Climate4kids@gmail.com'", "warning")
+        elif email:
+            # If the email is being used, an error is flashed and the page is reloaded
+            flash('Sorry, this email is already in use.', 'danger')
             return render_template('auth/register.html', form=form)
+
+        elif str(form.password.data) != str(form.repeatpassword.data):
+            # If the passwords are not equal, an error is flashed and the page is reloaded
+            flash('Passwords must match.', 'danger')
+            return render_template('auth/register.html', form=form)
+
+        else:
+            if form.email.data[-6:] == ".ac.uk" or form.email.data[-4:] == ".edu" or form.email.data[-7:] == ".sch.uk":
+                flash("Sorry - we only accept emails ending in '.ac.uk', '.edu' or '.sch.uk'! "
+                      "If you are a teacher but don't have access to one of these email domains, "
+                      "please email us at 'help.Climate4kids@gmail.com'", "warning")
+
+            else:
+                # If the username doesn't already exist, an account is created with the information the user input
+                teacher = Teacher(role="teacher",
+                                  name=form.fullname.data,
+                                  username=form.username.data,
+                                  password=form.password.data,
+                                  last_login=None,
+                                  registered_on=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                                  email=form.email.data)
+                db.session.add(teacher)
+                db.session.commit()
+                return redirect(url_for('login', form=LoginForm()))
 
     return render_template('auth/register.html', form=form)
 
@@ -139,10 +156,12 @@ def account(_username):
         group = Group.query.get(student.group_id)
         teacher = None
         students = None
+        group_average_quiz_score = None
         if group is not None:
             students = len(group.students)
             teacher = Teacher.query.get(group.teacher_id)
             group_average_quiz_score = get_group_average_quiz_score(group.id)
+
         average_quiz_score, quizzes_completed = get_student_average_quiz_score(current_user.id)
         return render_template('account.html', group=group, teacher=teacher, students=students,
                                average_quiz_score=average_quiz_score, quizzes_completed=quizzes_completed,
@@ -165,29 +184,27 @@ def change_password():
     if form.validate_on_submit():
         # Gets the user
         user = User.query.filter_by(username=form.username.data).first()
-        # Checks if user entered correct current password
+        inputpass = re.compile(r'(?=.*[A-Z])(?=.*[*?!()^+%&/$#@<>=}{~£])(?=.*\d)')
         if not user or not check_password_hash(user.password, form.current_password.data):
-            flash("Incorrect current password. Please try again.", "danger")
+            flash("Incorrect user or password. Please try again.", "danger")
+            return render_template('auth/change_password.html', form=form)
 
-            return render_template('change_password.html', form=form)
+        elif not inputpass.match(form.new_password.data):
+            flash("Password requires at least 1 digit, 1 uppercase letter and 1 special character.", 'danger')
+
+        elif str(form.new_password.data) != str(form.confirm_new_password.data):
+            flash("New passwords must match.", "danger")
+            return render_template('auth/change_password.html', form=form)
+
         # If user did enter correct current password, go ahead with password change:
-        new_pass = form.new_password.data
+        else:
+            user.password = generate_password_hash(form.new_password.data)
+            db.session.commit()
 
-        # Generate hash for new password
-        new_pass = generate_password_hash(new_pass)
-        # If user did enter correct current password, go ahead with password change:
-        user.password = new_pass
-        db.session.add(user)
-        db.session.commit()
-
-        # Sends email to the teacher with their new password
-        message = MIMEMultipart()
-        message["Subject"] = f"{user.name} password reset"
-        message["From"] = SMTP_EMAIL
-        message["To"] = user.email
-        now = datetime.now()
-        current_time = now.strftime("%H:%M:%S")
-        html = f"""\
+            flash("Your password has been changed", "info")
+            logout_user()
+            current_time = datetime.now().strftime("%H:%M:%S")
+            html = f"""\
                     <html>
                       <head></head>
                       <body>
@@ -198,7 +215,7 @@ def change_password():
                         <br>
                         <p> Time of change: {current_time}
                         <br>
-                        <p>If this was not done by you, please change your website password immediately.</p>
+                        <p>If this was not done by use, please change your website password immediately.</p>
                       </body>
                       <br>
                       <footer style="position:center">
@@ -210,16 +227,11 @@ def change_password():
                       </footer>
                     </html>
                     """
-        message.attach(MIMEText(html, "html"))
-        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        smtp_server.ehlo()
-        smtp_server.login(SMTP_EMAIL, SMTP_PASSWORD)
-        smtp_server.sendmail(SMTP_EMAIL, user.email, message.as_string())
-        smtp_server.close()
+            send_email(user, html)
+            return redirect(url_for('users.login', form=LoginForm()))
+        # Checks if user entered correct current password
 
-        flash("Your password has been changed", "info")
-        return render_template('change_password.html', form=form)
-    return render_template('change_password.html', form=form)
+    return render_template('auth/change_password.html', form=form)
 
 
 @users.route('/forgotten_password', methods=['GET', 'POST'])
@@ -231,7 +243,7 @@ def forgotten_password():
         # Checks if user entered correct current password
         if not user:
             flash("That account does not exist.", "danger")
-            return render_template('forgotten_password.html', form=form)
+            return render_template('auth/forgotten_password.html', form=form)
 
         new_pass = ""
         # Auto generates new password
@@ -239,24 +251,14 @@ def forgotten_password():
         for _ in range(3):
             new_pass += words[randint(0, len(words) - 1)].replace("\n", "")
         new_pass += nums
-        email_pas = new_pass
         # Generates hash for new password and commits to the DB
-        new_pass = generate_password_hash(new_pass)
-        user.password = new_pass
-        db.session.add(user)
+        user.password = generate_password_hash(new_pass)
         db.session.commit()
-
-        # Sends email to the teacher with their new password
-        message = MIMEMultipart()
-        message["Subject"] = f"{user.name} password reset"
-        message["From"] = SMTP_EMAIL
-        message["To"] = user.email
-
         html = f"""\
             <html>
               <head></head>
               <body>
-                <p><b>Hello {user.name}. Your new password is {email_pas}</b></p>
+                <p><b>Hello {user.name}. Your new password is {new_pass}</b></p>
                 <br>
                 <br>
                 <p>We urge you to change the password as soon as possible.</p>
@@ -271,31 +273,33 @@ def forgotten_password():
               </footer>
             </html>
             """
-        message.attach(MIMEText(html, "html"))
-        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        smtp_server.ehlo()
-        smtp_server.login(SMTP_EMAIL, SMTP_PASSWORD)
-        smtp_server.sendmail(SMTP_EMAIL, user.email, message.as_string())
-        smtp_server.close()
+        send_email(user, html)
 
-        email_pas = ""
         flash("Your new temporary password has been sent to your email.", "info")
-        return render_template('forgotten_password.html', form=form)
-    return render_template('forgotten_password.html', form=form)
+        return redirect(url_for('users.login', form=LoginForm()))
+    return render_template('auth/forgotten_password.html', form=form)
 
 
-
-@users.route('/account/<string:_username>/join_group')
-@login_required
-@requires_roles('student')
-def join_group(_username):
-    return render_template('index.html')
+# @users.route('/account/<string:_username>/join_group')
+# @login_required
+# @requires_roles('student')
+# def join_group(_username):
+#     return render_template('index.html')
 
 
 @users.route('/content', methods=['GET'])
 @login_required
 def content():
-    return render_template('content.html')
+    group = None
+    if current_user.role == 'student':
+        group_id = User.query.get(current_user.id).group_id
+        group = Group.query.get(group_id)
+
+    elif current_user.role == 'teacher':
+        group = Group.query.filter_by(teacher_id=current_user.id).first()
+
+    print(group.key_stage)
+    return render_template('content.html', key_stage=int(group.key_stage))
 
 
 # Displays all the quizzes available to the current user
@@ -321,7 +325,7 @@ def quizzes():
 
         nav.Bar('quiz_navbar', nav_items)
 
-        return render_template('quizzes.html', current_user=current_user)
+        return render_template('quizzes/quizzes.html', current_user=current_user)
 
 
 @users.route('/quiz_questions/<int:quiz_id>', methods=['POST', 'GET'])
@@ -367,9 +371,8 @@ def quiz_questions(quiz_id):
         db.session.add(quiz_score)
         db.session.commit()
 
-        return render_template('quiz_results.html', quiz_score=score)
-
-    return render_template('quiz_question.html', form=form)
+        return render_template('quizzes/quiz_results.html', quiz_score=score)
+    return render_template('quizzes/quiz_question.html', form=form)
 
 
 @users.route('/groups/<string:group_id>', methods=['GET'])
@@ -622,6 +625,25 @@ def generate_account(name):
     password += nums
 
     return username, password
+
+
+def send_email(user, html):
+    if user.role == 'student':
+        group = Group.query.get(User.group_id)
+        email = Teacher.get(group.teacher_id).email
+    else:
+        email = user.email
+
+    message = MIMEMultipart()
+    message["Subject"] = f"{user.name} password reset"
+    message["From"] = SMTP_EMAIL
+    message["To"] = email
+    message.attach(MIMEText(html, "html"))
+    smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+    smtp_server.ehlo()
+    smtp_server.login(SMTP_EMAIL, SMTP_PASSWORD)
+    smtp_server.sendmail(SMTP_EMAIL, email, message.as_string())
+    smtp_server.close()
 
 
 """  

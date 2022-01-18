@@ -24,37 +24,22 @@
             {{ form.csrf_token }}
                 <div class="form-group col mb-6">
                     {{ form.username(class_="form-control", placeholder="Username") }}
-                    {% for error in form.username.errors %}
-                                {{ error }}
-                            {% endfor %}
                 </div>
 
                 <div class="form-group col mb-6">
                     {{ form.email(class_="form-control", placeholder="Email") }}
-                    {% for error in form.email.errors %}
-                                {{ error }}
-                            {% endfor %}
                 </div>
 
                 <div class="form-group col mb-6">
                     {{ form.fullname(class_="form-control", placeholder="Full Name") }}
-                    {% for error in form.fullname.errors %}
-                                {{ error }}
-                            {% endfor %}
                 </div>
 
                 <div class="form-group col mb-6">
                     {{ form.password(class_="form-control", placeholder="Password", size=99) }}
-                    {% for error in form.password.errors %}
-                                {{ error }}
-                            {% endfor %}
                 </div>
 
                 <div class="form-group col mb-6">
                     {{ form.repeatpassword(class_="form-control", placeholder="Repeat Password", size=99) }}
-                    {% for error in form.repeatpassword.errors %}
-                                {{ error }}
-                            {% endfor %}
                 </div>
 
                 <div class="form-group col mb-6">

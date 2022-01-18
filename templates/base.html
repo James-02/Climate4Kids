@@ -49,14 +49,14 @@
           {% if current_user.is_authenticated %}
               <div class="account-avatar">
                   <img src="{{ url_for('static', filename='media/avatar.png') }}" class="img-av" alt="Default Avatar">
-                  <button type="button" class="btn dropdown-toggle shadow-none" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <button style="font-size: 16px;" type="button" class="btn dropdown-toggle shadow-none" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       {{ current_user.name }}
                     </button>
 
                     <div class="dropdown-menu dropdown-menu-right">
                         <a class="dropdown-item" href="{{ url_for('users.account', _username=current_user.username) }}">Account</a>
                         <a class="dropdown-item" href="{{ url_for('users.change_password') }}">Change Password</a>
-                        <a class="dropdown-item" href="{{ url_for('users.join_group', _username=current_user.username) }}">Join A Group</a>
+{#                        <a class="dropdown-item" href="{{ url_for('users.join_group', _username=current_user.username) }}">Join A Group</a>#}
                     <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{{ url_for('users.logout') }}">Logout</a>
                     </div>
@@ -64,7 +64,6 @@
         {% else %}
                 <ul class="navbar-nav float-right" style="align-content: end">
                 <li class="nav-item">
-                      <a class="nav-link" href="{{ url_for('users.forgotten_password') }}">Password reset</a>
                   </li>
                   <li class="nav-item">
                       <a class="nav-link" style="" href="{{ url_for('users.login') }}">Login</a>
