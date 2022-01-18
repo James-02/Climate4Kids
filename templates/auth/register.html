@@ -1,5 +1,78 @@
 {% extends "base.html" %}
-{% block title %} Registration {% endblock %}
-{% block card_name %} REGISTRATION CARD {% endblock %}
-{% block card_content %} REGISTRATION CARD CONTENT {% endblock %}
-{% block card_footer %} Happy reading {% endblock %}
+{% block title %}Register{% endblock %}
+{% block content %}
+    <div class="card text-center shadow p-3 mb-5 bg-white rounded mx-auto my-auto" style="width: 35rem;">
+        <div class="card mb-1">
+          <div class="card-body">
+            <h3 class="title is-3">Register</h3>
+            <div class="box">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <span>{{ message }}</span>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
+            <form method="POST" class="form" action="{{ url_for('users.register') }}">
+            {{ form.csrf_token }}
+                <div class="form-group col mb-6">
+                    {{ form.username(class_="form-control", placeholder="Username") }}
+                    {% for error in form.username.errors %}
+                                {{ error }}
+                            {% endfor %}
+                </div>
+
+                <div class="form-group col mb-6">
+                    {{ form.email(class_="form-control", placeholder="Email") }}
+                    {% for error in form.email.errors %}
+                                {{ error }}
+                            {% endfor %}
+                </div>
+
+                <div class="form-group col mb-6">
+                    {{ form.fullname(class_="form-control", placeholder="Full Name") }}
+                    {% for error in form.fullname.errors %}
+                                {{ error }}
+                            {% endfor %}
+                </div>
+
+                <div class="form-group col mb-6">
+                    {{ form.password(class_="form-control", placeholder="Password", size=99) }}
+                    {% for error in form.password.errors %}
+                                {{ error }}
+                            {% endfor %}
+                </div>
+
+                <div class="form-group col mb-6">
+                    {{ form.repeatpassword(class_="form-control", placeholder="Repeat Password", size=99) }}
+                    {% for error in form.repeatpassword.errors %}
+                                {{ error }}
+                            {% endfor %}
+                </div>
+
+                <div class="form-group col mb-6">
+                    <div class="form-check float-left">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember_me">
+                        <label class="form-check-label" for="remember">
+                            Remember me
+                        </label>
+                </div>
+                    <div class="form-group col mb-6 float-left">
+                        {{ form.submit(class_="btn btn-success is-centered") }}
+                    </div>
+                </div>
+
+            </form>
+
+            </div>
+        </div>
+    </div>
+ </div>
+{% endblock %}

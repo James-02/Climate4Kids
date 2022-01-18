@@ -1,7 +1,10 @@
 from flask_wtf import FlaskForm
 from flask import flash
-from wtforms import StringField, IntegerField, SubmitField, TextAreaField, PasswordField, FormField, RadioField, FieldList
-from wtforms.validators import DataRequired, InputRequired, ValidationError, NumberRange, equal_to, Length
+from wtforms import StringField, IntegerField, SubmitField, TextAreaField, PasswordField, FormField, RadioField, \
+    FieldList
+from wtforms.validators import DataRequired, InputRequired, ValidationError, NumberRange, equal_to, Length, Email, \
+    EqualTo
+import re
 
 
 def name_check(_form, name):
@@ -20,9 +23,23 @@ class CreateGroup(FlaskForm):
     submit = SubmitField()
 
 
-class RegisterStudent(FlaskForm):
-    names = TextAreaField(validators=[InputRequired(), name_check])
+class RegisterForm(FlaskForm):
+    # Adds validation to the user inputs
+    username = StringField(validators=[DataRequired()])
+    email = StringField(validators=[DataRequired(), Email()])
+    fullname = StringField(validators=[DataRequired(), name_check])
+    password = PasswordField(
+        validators=[DataRequired(), Length(min=10, max=99, message='Password must be 10 to 99 characters in length.')])
+    repeatpassword = PasswordField(
+        validators=[DataRequired(), EqualTo('password', message='Both password fields must be equal!')])
     submit = SubmitField()
+
+    def validate_password(self, password):
+        # Function makes sure the password contains certain characters to ensure strength
+        inputpass = re.compile(r'(?=.*[A-Z])(?=.*[*?!()^+%&/$#@<>=}{~£])(?=.*\d)')
+        if not inputpass.match(self.password.data):
+            raise ValidationError(
+                "Password needs at least 1 digit, 1 uppercase letter and 1 of these: *?!()^+%&/$#@<>=}{~£.")
 
 
 class LoginForm(FlaskForm):
@@ -40,8 +57,8 @@ class ChangePassword(FlaskForm):
     confirm_new_password = PasswordField(
         validators=[DataRequired(), equal_to('new_password', message="Passwords must match")])
     submit = SubmitField()
-    
-    
+
+
 class QuizQuestionForm(FlaskForm):
     question_text = StringField("")
     radio_field = RadioField(validators=[DataRequired()])
