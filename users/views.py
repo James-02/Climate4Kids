@@ -5,7 +5,6 @@ import logging
 import os
 import re
 import smtplib
-
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -61,18 +60,24 @@ def register():
             flash('Passwords must match.', 'danger')
             return render_template('auth/register.html', form=form)
 
-        else:
-            # If the username doesn't already exist, an account is created with the information the user input
-            teacher = Teacher(role="teacher",
-                              name=form.fullname.data,
-                              username=form.username.data,
-                              password=form.password.data,
-                              last_login=None,
-                              registered_on=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-                              email=form.email.data)
-            db.session.add(teacher)
-            db.session.commit()
-            return login()
+        else
+          if form.email.data[-6:] == ".ac.uk" or form.email.data[-4:] == ".edu" or form.email.data[-7:] == ".sch.uk":
+              # If the username doesn't already exist, an account is created with the information the user input
+              teacher = Teacher(role="teacher",
+                                name=form.fullname.data,
+                                username=form.username.data,
+                                password=form.password.data,
+                                last_login=None,
+                                registered_on=datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                                email=form.email.data)
+              db.session.add(teacher)
+              db.session.commit()
+              return login()
+          else:
+              flash("Sorry - we only accept emails ending in '.ac.uk', '.edu' or '.sch.uk'! "
+                    "If you are a teacher but don't have access to one of these email domains, "
+                    "please email us at 'help.Climate4kids@gmail.com'", "warning")
+              return render_template('auth/register.html', form=form)
 
     return render_template('auth/register.html', form=form)
 
@@ -197,12 +202,47 @@ def change_password():
 
             flash("Your password has been changed", "info")
             logout_user()
+             # Sends email to the teacher with their new password
+            message = MIMEMultipart()
+            message["Subject"] = f"{user.name} password reset"
+            message["From"] = SMTP_EMAIL
+            message["To"] = user.email
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S")
+            html = f"""\
+                        <html>
+                          <head></head>
+                          <body>
+                            <p><b>Hello {user.name}. </b></p>
+                            <br>
+                            <br>
+                            <p> Your password was recently changed.
+                            <br>
+                            <p> Time of change: {current_time}
+                            <br>
+                            <p>If this was not done by you, please change your website password immediately.</p>
+                          </body>
+                          <br>
+                          <footer style="position:center">
+                          <b>Climate4Kids
+                          <br>
+                          <br>
+                          <i>For a better education to the next generation</i>
+                          </b>
+                          </footer>
+                        </html>
+                        """
+            message.attach(MIMEText(html, "html"))
+            smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+            smtp_server.ehlo()
+            smtp_server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            smtp_server.sendmail(SMTP_EMAIL, user.email, message.as_string())
+            smtp_server.close()
+
+            flash("Your password has been changed", "info")
             return redirect(url_for('users.login', form=LoginForm()))
-        # Checks if user entered correct current password
-
-    return render_template('auth/change_password.html', form=form)
-
-
+        return render_template('auth/change_password.html', form=form)
+      
 @users.route('/forgotten_password', methods=['GET', 'POST'])
 def forgotten_password():
     form = ForgottenPassword()

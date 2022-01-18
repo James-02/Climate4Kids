@@ -2,7 +2,6 @@
 # model of the database. Has constructors for handling the database information within python
 # (Will change as we change that details of variables and table interaction)
 from flask_login import UserMixin
-
 from app import db
 from werkzeug.security import generate_password_hash
 
