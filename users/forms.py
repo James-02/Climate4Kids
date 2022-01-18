@@ -29,7 +29,7 @@ class RegisterForm(FlaskForm):
     email = StringField(validators=[DataRequired(), Email()])
     fullname = StringField(validators=[DataRequired(), name_check])
     password = PasswordField(
-        validators=[DataRequired(), Length(min=7, max=100, message='Password must be 7 to 100 characters in length.')])
+        validators=[DataRequired(), Length(min=10, max=99, message='Password must be 10 to 99 characters in length.')])
     repeatpassword = PasswordField(
         validators=[DataRequired(), EqualTo('password', message='Both password fields must be equal!')])
     submit = SubmitField()

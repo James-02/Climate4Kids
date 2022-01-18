@@ -44,14 +44,14 @@
                 </div>
 
                 <div class="form-group col mb-6">
-                    {{ form.password(class_="form-control", placeholder="Password", size=32) }}
+                    {{ form.password(class_="form-control", placeholder="Password", size=99) }}
                     {% for error in form.password.errors %}
                                 {{ error }}
                             {% endfor %}
                 </div>
 
                 <div class="form-group col mb-6">
-                    {{ form.repeatpassword(class_="form-control", placeholder="Repeat Password", size=32) }}
+                    {{ form.repeatpassword(class_="form-control", placeholder="Repeat Password", size=99) }}
                     {% for error in form.repeatpassword.errors %}
                                 {{ error }}
                             {% endfor %}
