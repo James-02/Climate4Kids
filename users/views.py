@@ -45,13 +45,6 @@ def register():
             flash('Sorry, this username already exists')
             return render_template('auth/register.html', form=form)
 
-        acuk = form.email.data[-6:]
-        edu = form.email.data[-4:]
-        schuk = form.email.data[-7:]
-        print(acuk)
-        print(edu)
-        print(schuk)
-
         if form.email.data[-6:] == ".ac.uk" or form.email.data[-4:] == ".edu" or form.email.data[-7:] == ".sch.uk":
             # If the username doesn't already exist, an account is created with the information the user input
             teacher = Teacher(role="teacher",
