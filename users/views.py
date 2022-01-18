@@ -179,12 +179,47 @@ def forgotten_password():
         for _ in range(3):
             new_pass += words[randint(0, len(words) - 1)].replace("\n", "")
         new_pass += nums
+        email_pas = new_pass
+        print(email_pas)
         # Generates hash for new password and commits to the DB
         new_pass = generate_password_hash(new_pass)
         user.password = new_pass
         db.session.add(user)
         db.session.commit()
 
+        # Sends email to the teacher with their new password
+        message = MIMEMultipart()
+        message["Subject"] = f"{user.name} password reset"
+        message["From"] = SMTP_EMAIL
+        message["To"] = user.email
+
+        html = f"""\
+            <html>
+              <head></head>
+              <body>
+                <p><b>Hello {user.name}. Your new password is {email_pas}</b></p>
+                <br>
+                <br>
+                <p>We urge you to change the password as soon as possible.</p>
+              </body>
+              <br>
+              <footer style="position:center">
+              <b>Climate4Kids
+              <br>
+              <br>
+              <i>For a better education to the next generation</i>
+              </b>
+              </footer>
+            </html>
+            """
+        message.attach(MIMEText(html, "html"))
+        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        smtp_server.ehlo()
+        smtp_server.login(SMTP_EMAIL, SMTP_PASSWORD)
+        smtp_server.sendmail(SMTP_EMAIL, user.email, message.as_string())
+        smtp_server.close()
+
+        email_pas = ""
         flash("Your new temporary password has been sent to your email.", "info")
         return render_template('forgotten_password.html', form=form)
     return render_template('forgotten_password.html', form=form)
