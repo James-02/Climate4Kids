@@ -194,7 +194,7 @@ def change_password():
                         <br>
                         <p> Time of change: {current_time}
                         <br>
-                        <p>If this was not done by use, please change your website password immediately.</p>
+                        <p>If this was not done by you, please change your website password immediately.</p>
                       </body>
                       <br>
                       <footer style="position:center">
