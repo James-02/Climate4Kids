@@ -4,7 +4,8 @@ import csv
 import logging
 import os
 import smtplib
-
+import socket
+import urllib
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -174,6 +175,43 @@ def change_password():
         user.password = new_pass
         db.session.add(user)
         db.session.commit()
+
+        # Sends email to the teacher with their new password
+        message = MIMEMultipart()
+        message["Subject"] = f"{user.name} password reset"
+        message["From"] = SMTP_EMAIL
+        message["To"] = user.email
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        html = f"""\
+                    <html>
+                      <head></head>
+                      <body>
+                        <p><b>Hello {user.name}. </b></p>
+                        <br>
+                        <br>
+                        <p> Your password was recently changed.
+                        <br>
+                        <p> Time of change: {current_time}
+                        <br>
+                        <p>If this was not done by use, please change your website password immediately.</p>
+                      </body>
+                      <br>
+                      <footer style="position:center">
+                      <b>Climate4Kids
+                      <br>
+                      <br>
+                      <i>For a better education to the next generation</i>
+                      </b>
+                      </footer>
+                    </html>
+                    """
+        message.attach(MIMEText(html, "html"))
+        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        smtp_server.ehlo()
+        smtp_server.login(SMTP_EMAIL, SMTP_PASSWORD)
+        smtp_server.sendmail(SMTP_EMAIL, user.email, message.as_string())
+        smtp_server.close()
 
         flash("Your password has been changed", "info")
         return render_template('change_password.html', form=form)
