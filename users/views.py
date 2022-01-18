@@ -23,6 +23,7 @@ from wtforms.fields.core import Label
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from models import User, Student, Group, Teacher, Quiz, Question, StudentQuizScores
+from users.forms import CreateGroup, RegisterStudent, LoginForm, QuizForm, ChangePassword, ForgottenPassword
 from users.forms import CreateGroup, RegisterForm, LoginForm, QuizForm, ChangePassword
 
 from random import randint
@@ -79,7 +80,7 @@ def login():
         session['logins'] = 0
     # display error if user has made 4+ invalid login attempts
     elif session.get('logins') > 3:
-        flash('Exceeded 3 login attempts')
+        flash('Exceeded 3 login attempts', "danger")
 
     # create login form object
     form = LoginForm()
@@ -94,7 +95,7 @@ def login():
         if not user or not check_password_hash(user.password, form.password.data):
             # flash a warning message and reload the page if credentials are invalid
             if session['logins'] > 3:
-                flash("Exceeded login attempts.")
+                flash("Exceeded login attempts.", "danger")
             flash('Incorrect Username or Password, please try again.', 'danger')
             return render_template('auth/login.html', form=form)
 
@@ -170,20 +171,86 @@ def change_password():
         user = User.query.filter_by(username=form.username.data).first()
         # Checks if user entered correct current password
         if not user or not check_password_hash(user.password, form.current_password.data):
-            flash("Incorrect current password. Please try again.")
+            flash("Incorrect current password. Please try again.", "danger")
 
             return render_template('change_password.html', form=form)
         # If user did enter correct current password, go ahead with password change:
-        user.password == form.new_password.data
+        new_pass = form.new_password.data
+
+        # Generate hash for new password
+        new_pass = generate_password_hash(new_pass)
+        # If user did enter correct current password, go ahead with password change:
+        user.password = new_pass
         db.session.add(user)
         db.session.commit()
 
-        return render_template('index.html')
+        flash("Your password has been changed", "info")
+        return render_template('change_password.html', form=form)
     return render_template('change_password.html', form=form)
 
 
+@users.route('/forgotten_password', methods=['GET', 'POST'])
 def forgotten_password():
-    return render_template("index.html")
+    form = ForgottenPassword()
+    if form.validate_on_submit():
+        # Gets the user
+        user = User.query.filter_by(username=form.username.data).first()
+        # Checks if user entered correct current password
+        if not user:
+            flash("That account does not exist.", "danger")
+            return render_template('forgotten_password.html', form=form)
+
+        new_pass = ""
+        # Auto generates new password
+        nums = str(randint(1111, 9999))
+        for _ in range(3):
+            new_pass += words[randint(0, len(words) - 1)].replace("\n", "")
+        new_pass += nums
+        email_pas = new_pass
+        print(email_pas)
+        # Generates hash for new password and commits to the DB
+        new_pass = generate_password_hash(new_pass)
+        user.password = new_pass
+        db.session.add(user)
+        db.session.commit()
+
+        # Sends email to the teacher with their new password
+        message = MIMEMultipart()
+        message["Subject"] = f"{user.name} password reset"
+        message["From"] = SMTP_EMAIL
+        message["To"] = user.email
+
+        html = f"""\
+            <html>
+              <head></head>
+              <body>
+                <p><b>Hello {user.name}. Your new password is {email_pas}</b></p>
+                <br>
+                <br>
+                <p>We urge you to change the password as soon as possible.</p>
+              </body>
+              <br>
+              <footer style="position:center">
+              <b>Climate4Kids
+              <br>
+              <br>
+              <i>For a better education to the next generation</i>
+              </b>
+              </footer>
+            </html>
+            """
+        message.attach(MIMEText(html, "html"))
+        smtp_server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        smtp_server.ehlo()
+        smtp_server.login(SMTP_EMAIL, SMTP_PASSWORD)
+        smtp_server.sendmail(SMTP_EMAIL, user.email, message.as_string())
+        smtp_server.close()
+
+        email_pas = ""
+        flash("Your new temporary password has been sent to your email.", "info")
+        return render_template('forgotten_password.html', form=form)
+    return render_template('forgotten_password.html', form=form)
+
 
 
 @users.route('/account/<string:_username>/join_group')

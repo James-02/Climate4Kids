@@ -63,6 +63,9 @@
                 </div>
         {% else %}
                 <ul class="navbar-nav float-right" style="align-content: end">
+                <li class="nav-item">
+                      <a class="nav-link" href="{{ url_for('users.forgotten_password') }}">Password reset</a>
+                  </li>
                   <li class="nav-item">
                       <a class="nav-link" style="" href="{{ url_for('users.login') }}">Login</a>
                   </li>
