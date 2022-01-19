@@ -1,9 +1,10 @@
-from flask_wtf import FlaskForm
-from flask import flash
-from wtforms import StringField, IntegerField, SubmitField, TextAreaField, PasswordField, FormField, RadioField, \
-    FieldList
-from wtforms.validators import DataRequired, InputRequired, ValidationError, NumberRange, Length, Email
 import re
+
+from flask import flash
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField, PasswordField, FormField, RadioField, \
+    FieldList
+from wtforms.validators import DataRequired, ValidationError, Length, Email
 
 
 def name_check(_form, name):
@@ -13,18 +14,6 @@ def name_check(_form, name):
         if char in chars:
             flash("Special characters are not allowed.", "danger")
             raise ValidationError("Name cannot include special characters.")
-
-
-class CreateGroup(FlaskForm):
-    name = StringField(validators=[InputRequired(), name_check])
-    size = IntegerField(validators=[NumberRange(min=1, max=50)], default=30)
-    key_stage = IntegerField(validators=[NumberRange(min=1, max=9)])
-    submit = SubmitField()
-
-
-class RegisterStudent(FlaskForm):
-    names = TextAreaField(validators=[InputRequired(), name_check])
-    submit = SubmitField()
 
 
 class RegisterForm(FlaskForm):
