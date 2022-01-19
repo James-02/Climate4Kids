@@ -361,10 +361,10 @@ def get_student_average_quiz_score(student_id):
 def get_group_average_quiz_score(group_id):
     sum_of_all_scores = 0
     num_of_scores = 0
-    for g, sqs, q in db.session.query(Group, StudentQuizScores, Quiz).filter(
-            Group.id == group_id,
-            Group.key_stage == Quiz.key_stage,
-            Quiz.id == StudentQuizScores.quiz_id).all():
+
+    for sqs, s in db.session.query(StudentQuizScores, Student).filter(
+            Student.group_id == group_id,
+            StudentQuizScores.student_id == Student.id).all():
         sum_of_all_scores += sqs.score
         num_of_scores += 1
 
