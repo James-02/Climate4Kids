@@ -18,6 +18,8 @@ from users.forms import RegisterForm, LoginForm, QuizForm, ChangePassword, Forgo
 from random import randint
 from app import db, app, requires_roles
 
+import logging
+
 # CONFIG
 SMTP_EMAIL = app.config['SMTP_EMAIL']
 SMTP_PASSWORD = app.config['SMTP_PASSWORD']
@@ -72,6 +74,8 @@ def register():
                                   email=form.email.data)
                 db.session.add(teacher)
                 db.session.commit()
+
+                logging.warning('SECURITY - User registration [%s, %s]', form.username.data, request.remote_addr)
                 return login()
 
     return render_template('auth/register.html', form=form)
@@ -116,6 +120,8 @@ def login():
         date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         user.last_login = date
         db.session.commit()
+
+        logging.warning('SECURITY - Log in [%s, %s, %s]', current_user.id, current_user.username,request.remote_addr)
         # redirect the user to the appropriate page for their role
         if current_user.role == 'teacher':  # this may need changing
             return redirect(url_for('users.dashboard'))
@@ -129,6 +135,7 @@ def login():
 @users.route('/logout')
 @login_required
 def logout():
+    logging.warning('SECURITY - Log out [%s, %s, %s]', current_user.id, current_user.username, request.remote_addr)
     logout_user()
     return redirect(url_for('index'))
 
@@ -412,6 +419,9 @@ def send_email(user, body):
     smtp_server.login(SMTP_EMAIL, SMTP_PASSWORD)
     smtp_server.sendmail(SMTP_EMAIL, email, message.as_string())
     smtp_server.close()
+
+    logging.warning('SECURITY - reset password e-mail sent [%s, %s, %s]', current_user.id, current_user.username,
+                    request.remote_addr)
 
 
 """  

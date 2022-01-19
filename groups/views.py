@@ -10,13 +10,15 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from random import randint
 
-from flask import flash, current_app, Blueprint, render_template, redirect, url_for
+from flask import flash, current_app, Blueprint, render_template, redirect, url_for, request
 from flask_login import current_user, login_required
 
 from users.views import users, get_student_average_quiz_score
 from app import db, app, requires_roles
 from groups.forms import CreateGroup, RegisterStudent
 from models import User, Student, Group, Teacher
+
+import logging
 
 # CONFIG
 SMTP_EMAIL = app.config['SMTP_EMAIL']
@@ -69,6 +71,10 @@ def create_group():
             group.teacher_id = current_user.id
             db.session.add(group)
             db.session.commit()
+
+            logging.warning('SECURITY - Created Group [%s, %s, %s, %s]',group_id, current_user.id,
+                            current_user.username, request.remote_addr)
+
             return redirect(url_for('groups.create_students', group_id=group_id))
     return render_template('groups/create_group.html', form=form)
 
@@ -111,6 +117,9 @@ def create_students(group_id):
         if not send_student_data(group.name, filename, teacher.email):
             flash(f"Unable to send CSV to {teacher.email}, please contact help.Climate4kids@gmail.com", "danger")
         else:
+            logging.warning('SECURITY - Created Students [%s, %s, %s, %s]',group_id , current_user.id,
+                            current_user.username,request.remote_addr)
+
             return redirect(url_for('groups.group', group_id=group_id))
 
     return render_template('groups/create_students.html', form=form, group_id=group_id)
@@ -122,6 +131,10 @@ def create_students(group_id):
 def delete_group(group_id):
     db.session.query(Group).filter_by(id=group_id).delete()
     db.session.commit()
+
+    logging.warning('SECURITY - Deleted Group [%s, %s, %s, %s]',group_id, current_user.id, current_user.username,
+                    request.remote_addr)
+
     return redirect(url_for('users.dashboard'))
 
 
