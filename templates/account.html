@@ -49,6 +49,7 @@
       </div>
     </div>
 </div>
+    {% if group != None %}
 <div class="card text-center border-primary shadow p-3 mb-5 bg-white rounded">
         <div class="card mb-1">
           <img src="../static/media/group-avatar.png" class="card-img-av" alt="Default Group Avatar" style="float:left;width:72px;height:73px;">
@@ -93,5 +94,6 @@
           </div>
         </div>
 </div>
+        {% endif %}
 {% endif %}
 {% endblock %}

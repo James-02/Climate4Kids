@@ -19,7 +19,7 @@
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
-                <form method="POST" action="{{ url_for('users.create_students', group_id=group_id) }}">
+                <form method="POST" action="{{ url_for('groups.create_students', group_id=group_id) }}">
                 {{ form.csrf_token }}
                 <div class="form-group col mb-6">
                     {{ form.names(class="form-control", rows=15, placeholder="Example:\nMichael Brown\nJulia Webster") }}

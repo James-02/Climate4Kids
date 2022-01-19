@@ -94,10 +94,12 @@ if __name__ == '__main__':
 
     # import blueprints
     from users.views import users
+    from groups.views import groups
     from webadmin.views import webadmin_blueprint
    
     # register blueprints
     app.register_blueprint(users)
+    app.register_blueprint(groups)
     app.register_blueprint(webadmin_blueprint)
     
     app.run(debug=True)

@@ -19,7 +19,7 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <form method="POST" class="form" action="{{ url_for('users.create_group') }}">
+        <form method="POST" class="form" action="{{ url_for('groups.create_group') }}">
         {{ form.csrf_token }}
             <div class="form-group col mb-6">
                 {{ form.name(class_="form-control", placeholder="Name") }}
