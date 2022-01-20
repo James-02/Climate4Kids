@@ -48,6 +48,11 @@
     height: auto;
     position:relative;
 }
+.quiz-main {
+    display: flex;
+    align-items:center;
+    position: relative;
+}
 .account-avatar {
     display: flex;
     align-items:center;
@@ -225,4 +230,18 @@ html, body {
     height: 90px;
     border-radius: 100%;
     margin-right: 30px
+}
+
+.quiz-main-title:visited {
+    color: mediumpurple;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+.quiz-main-title:hover {
+    color: blue;
+    transition: all 0.1s linear;
+    transform: scale(1.02);
+    background-color: transparent;
+    text-decoration: underline;
 }
