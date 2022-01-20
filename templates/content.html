@@ -27,7 +27,46 @@
           </div>
         </div>
 </div>
-    {% endif %}
+{% endif %}
+    <!--------------------->
+{% if key_stage == 1 or current_user.role == 'teacher' %}
+    <div class="card text-center shadow p-3 mb-5 bg-white rounded">
+        <div class="card mb-1">
+          <img src="https://belfasthills.org/wp-content/uploads/2015/02/Shallow-Tropical-Sea-Banner.jpg" class="card-img-top" alt="The sea">
+          <div class="card-body" style="font-family: 'Comic Sans MS', serif">
+            <h5 class="card-title">KS1 - The seas</h5>
+            <p class="card-text">
+                The seas are home to some of the worlds most magical creatures. Did you know that we have explored
+                just 5% of the sea?
+
+            The sea level in the world is currently rising, because lots of iceburgs are melting. This can cause lots
+                of problems, such as polar bears not having a home because there is no more ice.
+            </p>
+            <p class="card-text"><small class="text-muted">Task - think about what animals may still lurk
+            in the sea that we haven't yet discovered!</small></p>
+          </div>
+        </div>
+</div>
+{% endif %}
+        <!--------------------->
+{% if key_stage == 1 or current_user.role == 'teacher' %}
+    <div class="card text-center shadow p-3 mb-5 bg-white rounded">
+        <div class="card mb-1">
+          <img src="https://i.pinimg.com/originals/73/33/99/7333998964bec5d35202efcbe4aceab4.jpg" class="card-img-top"
+               alt="Banner saying reduce, reuse, recycle">
+          <div class="card-body" style="font-family: 'Comic Sans MS', serif">
+            <h5 class="card-title">KS1 - Be a recycle ranger!</h5>
+            <p class="card-text">
+                Every single year, 11.2 billion tonnes of waste is collected. That is the same is 6 billion elephants!
+                Almost enough for every person to have their own. For every tonne of waste that is collected, we could save
+                17 trees!
+            </p>
+            <p class="card-text"><small class="text-muted">Task - how much do you recycle? what can you do to improve this></small></p>
+          </div>
+        </div>
+</div>
+{% endif %}
+    <!--------------------->
 {% if key_stage == 2 or current_user.role == 'teacher' %}
     <div class="card text-center shadow p-3 mb-5 bg-white rounded">
         <div class="card mb-1">
@@ -58,6 +97,40 @@ Banner saying 'climate change' with a sun, clouds and thermometer behind it.">
             </p>
             <p class="card-text"><small class="text-muted">Task - do you think climate change is good, bad
             or both? Write a paragraph explaining why.</small></p>
+          </div>
+        </div>
+</div>
+    {% endif %}
+    <!--------------------->
+{% if key_stage == 2 or current_user.role == 'teacher' %}
+    <div class="card text-center shadow p-3 mb-5 bg-white rounded">
+        <div class="card mb-1">
+          <img src="https://www.wagggs.org/documents/589/WAGGGS_COP_21_Banner_Girls_for_a_Greener_Future_without_text.jpg" class="card-img-top" alt="
+A melting planet">
+          <div class="card-body" style="font-family: 'Comic Sans MS', serif">
+            <h5 class="card-title">KS2 - What can you do to stop climate change?</h5>
+            <p class="card-text">
+                Fighting climate change doesn't have to be hard - if we all make small changes, big things can happen.
+                <br>
+                <br><b>Energy</b>
+                <br>- Turn off lights that you don't need!
+                <br>- Try and persuade your parents/carers to switch to energy saving LED bulbs
+                <br>
+
+                <br><b>Transport</b>
+                <br>- Walk or cycle when possible, it's great for the planet, mind and body
+                <br>
+
+                <br><b>Diet</b>
+                <br>- Eat more vegetables, fruits, grains, nuts and seeds
+                <br>- Eat less meat and dairy (try meat-free Mondays)
+                <br>
+                <br><b>Reduce, reuse, repair, recycle!</b>
+                <br>- Recycling is actually the last possible action you should take. It isn't perfect.
+                <br>- Before recycling, try and get as much use out of it as possible!
+            </p>
+            <p class="card-text"><small class="text-muted">Task - how many of these things do you
+            already do?</small></p>
           </div>
         </div>
 </div>
