@@ -58,7 +58,7 @@ def register():
             return render_template('auth/register.html', form=form)
 
         else:
-            if form.email.data[-6:] == ".ac.uk" or form.email.data[-4:] == ".edu" or form.email.data[-7:] == ".sch.uk":
+            if form.email.data[-6:] != ".ac.uk" or form.email.data[-4:] == ".edu" or form.email.data[-7:] == ".sch.uk":
                 flash("Sorry - we only accept emails ending in '.ac.uk', '.edu' or '.sch.uk'! "
                       "If you are a teacher but don't have access to one of these email domains, "
                       "please email us at 'help.Climate4kids@gmail.com'", "warning")

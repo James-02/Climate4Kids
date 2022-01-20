@@ -19,7 +19,7 @@ db = SQLAlchemy(app)
 print(db)
 
 # logging
-fh = logging.FileHandler("C:/Users/macks/PycharmProjects/Stage2-Team-Project/security.txt", "w")
+fh = logging.FileHandler("security.txt", "w")
 fh.setLevel(logging.WARNING)
 formatter = logging.Formatter('%(asctime)s : %(message)s', '%m/%d/%Y %I:%m:%S %p')
 fh.setFormatter(formatter)
