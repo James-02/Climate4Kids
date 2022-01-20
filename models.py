@@ -264,22 +264,24 @@ def init_db():
                                             score=60)
 
     admin = Teacher(role="teacher",
-                      name="admin",
-                      username="admin",
-                      password="Unguessable12*",
-                      last_login=None,
-                      registered_on="19/12/2021 00:55:11",
-                      email="diversitycontracters1@gmail.com")
+                    name="admin",
+                    username="admin",
+                    password="Unguessable12*",
+                    last_login=None,
+                    registered_on="19/12/2021 00:55:11",
+                    email="jamjar6922@gmail.com")
 
     admin_group = Group(id="-1",
-                  name="admin group",
-                  size=0,
-                  teacher_id=admin.id,
-                  key_stage=0)
+                        name="admin group",
+                        size=1,
+                        teacher_id=admin.id,
+                        key_stage=0)
 
     db.session.add(teacher)
+    db.session.add(admin)
     db.session.commit()
     db.session.add(group)
+    db.session.add(admin_group)
     db.session.commit()
     db.session.add(student)
     db.session.add(quiz0)
@@ -299,6 +301,7 @@ def init_db():
     db.session.add(student_quiz_score0)
     db.session.add(student_quiz_score1)
     group.teacher_id = teacher.id
+    admin_group.teacher_id = admin.id
 
     db.session.commit()
 

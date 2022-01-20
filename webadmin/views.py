@@ -3,21 +3,28 @@ Author: Harry Hamilton
 Date: 08/12/21
 """
 from flask import Blueprint, render_template
+from flask_login import current_user, login_required
 import logging
+
+from models import Group
 
 # CONFIG
 webadmin_blueprint = Blueprint('webadmin', __name__, template_folder='templates')
 
 
-@webadmin_blueprint.route('/logs', methods=['POST'])
+@webadmin_blueprint.route('/logs', methods=['GET'])
+@login_required
 def logs():
-    admin_ids = Group.query.filter(group_id == '-1').all()
+    group = Group.query.get('-1')
+    if current_user.id != group.teacher_id:
+        return render_template('errors/403.html')
 
-    if current_user.id not in admin_ids:
-        return redirect(url_for('page_forbidden'))
     else:
-        with open("C:/Users/Joppy/Documents/Programming/UniStuff/2033/Stage2-Team-Project/security.txt", "r") as f:
-            entries = f.read().splitlines()[-25:]
-            entries.reverse()
+        try:
+            with open("security.txt", "r") as f:
+                entries = f.read().splitlines()[-25:]
+                entries.reverse()
+                return render_template('webadmin.html', logs=entries)
+        except:
+            return render_template('webadmin.html', logs=None)
 
-            return render_template('webadmin.html', logs=enteries)
