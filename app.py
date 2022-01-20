@@ -18,6 +18,14 @@ app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
 print(db)
 
+# logging
+fh = logging.FileHandler("security.txt", "w")
+fh.setLevel(logging.WARNING)
+formatter = logging.Formatter('%(asctime)s : %(message)s', '%m/%d/%Y %I:%m:%S %p')
+fh.setFormatter(formatter)
+logger = logging.getLogger('')
+logger.propagate = False
+logger.addHandler(fh)
 
 @app.before_request
 def before_request():
