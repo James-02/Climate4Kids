@@ -12,14 +12,19 @@ import logging
 
 # app configuration
 app = Flask(__name__, static_url_path='/static', static_folder='static')
-app.config.from_object('config.DevelopmentConfig')
+if app.config['ENV'] == 'production':
+    app.config.from_object('config.ProductionConfig')
+
+else:
+    app.config.from_object('config.DevelopmentConfig')
+
 
 # create database instance
 db = SQLAlchemy(app)
 print(db)
 
 # logging
-fh = logging.FileHandler("security.txt", "w")
+fh = logging.FileHandler("security.log", "w")
 fh.setLevel(logging.WARNING)
 formatter = logging.Formatter('%(asctime)s : %(message)s', '%m/%d/%Y %I:%m:%S %p')
 fh.setFormatter(formatter)

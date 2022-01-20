@@ -21,7 +21,7 @@ def logs():
 
     else:
         try:
-            with open("security.txt", "r") as f:
+            with open("security.log", "r") as f:
                 entries = f.read().splitlines()[-25:]
                 entries.reverse()
                 return render_template('webadmin.html', logs=entries)
