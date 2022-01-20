@@ -48,6 +48,24 @@
         </div>
 </div>
 {% endif %}
+        <!--------------------->
+{% if key_stage == 1 or current_user.role == 'teacher' %}
+    <div class="card text-center shadow p-3 mb-5 bg-white rounded">
+        <div class="card mb-1">
+          <img src="https://i.pinimg.com/originals/73/33/99/7333998964bec5d35202efcbe4aceab4.jpg" class="card-img-top"
+               alt="Banner saying reduce, reuse, recycle">
+          <div class="card-body" style="font-family: 'Comic Sans MS', serif">
+            <h5 class="card-title">KS1 - Be a recycle ranger!</h5>
+            <p class="card-text">
+                Every single year, 11.2 billion tonnes of waste is collected. That is the same is 6 billion elephants!
+                Almost enough for every person to have their own. For every tonne of waste that is collected, we could save
+                17 trees!
+            </p>
+            <p class="card-text"><small class="text-muted">Task - how much do you recycle? what can you do to improve this></small></p>
+          </div>
+        </div>
+</div>
+{% endif %}
     <!--------------------->
 {% if key_stage == 2 or current_user.role == 'teacher' %}
     <div class="card text-center shadow p-3 mb-5 bg-white rounded">
