@@ -58,12 +58,7 @@ def register():
             return render_template('auth/register.html', form=form)
 
         else:
-            if form.email.data[-6:] != ".ac.uk" or form.email.data[-4:] == ".edu" or form.email.data[-7:] == ".sch.uk":
-                flash("Sorry - we only accept emails ending in '.ac.uk', '.edu' or '.sch.uk'! "
-                      "If you are a teacher but don't have access to one of these email domains, "
-                      "please email us at 'help.Climate4kids@gmail.com'", "warning")
-
-            else:
+            if form.email.data[-6:] == ".ac.uk" or form.email.data[-4:] == ".edu" or form.email.data[-7:] == ".sch.uk":
                 # If the username doesn't already exist, an account is created with the information the user input
                 teacher = Teacher(role="teacher",
                                   name=form.fullname.data,
@@ -77,6 +72,10 @@ def register():
 
                 logging.warning('SECURITY - User registration [%s, %s]', form.username.data, request.remote_addr)
                 return login()
+            else:
+                flash("Sorry - we only accept emails ending in '.ac.uk', '.edu' or '.sch.uk'! "
+                      "If you are a teacher but don't have access to one of these email domains, "
+                      "please email us at 'help.Climate4kids@gmail.com'", "warning")
 
     return render_template('auth/register.html', form=form)
 
@@ -166,8 +165,8 @@ def account(_username):
 
         average_quiz_score, quizzes_completed = get_student_average_quiz_score(current_user.id)
         return render_template('account.html', group=group, teacher=teacher, students=students,
-                               average_quiz_score=average_quiz_score, quizzes_completed=quizzes_completed,
-                               group_average_quiz_score=group_average_quiz_score)
+                               average_quiz_score=int(average_quiz_score), quizzes_completed=quizzes_completed,
+                               group_average_quiz_score=int(group_average_quiz_score))
 
     if current_user.role == 'teacher':
         group_average_quiz_score = 0
@@ -283,24 +282,16 @@ def content():
 @login_required
 def quizzes():
     # displays all the quizzes available to the user, that is, quizzes under the same key stage as the user's group
-    available_quizzes = []
-    for s, q, g in db.session.query(Student, Quiz, Group).filter(Student.id == current_user.id,
-                                                                 Group.id == Student.group_id,
-                                                                 Quiz.key_stage == Group.key_stage).all():
-        available_quizzes.append((q.id, q.name))
+    quizzes = []
+    if current_user.role == 'student':
+        for s, q, g in db.session.query(Student, Quiz, Group).filter(Student.id == current_user.id,
+                                                                     Group.id == Student.group_id,
+                                                                     Quiz.key_stage == Group.key_stage).all():
+            quizzes.append(q)
+    else:
+        quizzes = Quiz.query.all()
 
-    with app.app_context():
-        nav = Navigation()
-        nav.init_app(app)
-
-        nav_items = []
-
-        for quiz in available_quizzes:
-            nav_items.append(nav.Item(quiz[1], 'users.quiz_questions', {'quiz_id': quiz[0]}))
-
-        nav.Bar('quiz_navbar', nav_items)
-
-        return render_template('quizzes/quizzes.html', current_user=current_user)
+    return render_template('quizzes/quizzes.html', current_user=current_user, quizzes=quizzes)
 
 
 @users.route('/quiz_questions/<int:quiz_id>', methods=['POST', 'GET'])
@@ -312,6 +303,7 @@ def quiz_questions(quiz_id):
     # correct_choice = 2
 
     # get all questions for the specified quiz
+    quiz = Quiz.query.get(quiz_id)
     questions = Question.query.filter_by(quiz_id=quiz_id).all()
 
     # define the question label and choices for each question
@@ -345,8 +337,8 @@ def quiz_questions(quiz_id):
         db.session.add(quiz_score)
         db.session.commit()
 
-        return render_template('quizzes/quiz_results.html', quiz_score=score)
-    return render_template('quizzes/quiz_question.html', form=form)
+        return render_template('quizzes/quiz_results.html', quiz_score=score, quiz=quiz)
+    return render_template('quizzes/quiz_question.html', form=form, quiz=quiz)
 
 
 # returns the average score and number of quizzes completed by the specified student
@@ -378,7 +370,7 @@ def get_group_average_quiz_score(group_id):
     if num_of_scores == 0:
         return 0
     else:
-        return sum_of_all_scores / num_of_scores
+        return int(sum_of_all_scores / num_of_scores)
 
 
 def send_email(user, body):
@@ -427,4 +419,3 @@ def send_email(user, body):
 """  
 Useful explanation of querying with Inheritance: https://docs.sqlalchemy.org/en/14/orm/inheritance_loading.html
 """
-
