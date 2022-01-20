@@ -10,7 +10,7 @@ To run the Flask server with the terminal:
 
 # Important
 * For full functionality register a teacher account with an accessible email.
-* The project is currently using a local sqlite3 db as it is easier for development however MySQL is fully implemented to use if neccessary.
+* The project is currently using a local sqlite3 db as it is easier for development however MySQL is fully implemented to use if necessary.
 * If the db tables are required to be generated again run these commands within an active Python Console:
 ```
 from app import db
