@@ -7,8 +7,16 @@ To run the Flask server with the terminal:
 - Go to `http://127.0.0.1:5000/` 
 
 
+
 # Important
-For full functionality register a teacher account with an accessible email and this way you are able to also access student accounts.
+* For full functionality register a teacher account with an accessible email.
+* The project is currently using a local sqlite3 db as it is easier for development however MySQL is fully implemented to use if necessary.
+* If the db tables are required to be generated again run these commands within an active Python Console:
+```
+from app import db
+from models import init_db
+init_db()
+```
 
 # REPO
 https://github.com/HarryHamilton/Stage2-Team-Project
