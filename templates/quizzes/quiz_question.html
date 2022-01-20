@@ -1,25 +1,32 @@
 {% extends "base.html" %}
 {% block title %}Climate 4 Kids | Quiz{% endblock %}
 {% block content %}
-    <div class="card text-start shadow p-3 mb-5 bg-white rounded">
+    <div class="card text-start mx-auto my-auto shadow p-3 mb-5 bg-white rounded" style="width: 50rem">
      <div class="card mb-1">
           <div class="card-body" style="font-family: 'Comic Sans MS', serif">
-            <ul>
-                <form method="POST">
-                    {% for question in form.questions %}
-                        <h5 class="card-title float-left">{{ question.question_text.label }}</h5>
-                        <br>
-                        <br>
-                        {% for error in question.radio_field.errors %}
-                            {{ error }}
-                        {% endfor %}
-                        {{ question.hidden_tag() }}
-                        {{ question.radio_field }}
-                    {% endfor %}
-                    <p>{{ form.submit() }}</p>
-                    {{ form.hidden_tag() }}
-                </form>
-            </ul>
+          <h1 class="text-center text-underline text-primary">{{ quiz.name }} Quiz</h1>
+          <table>
+          <tbody>
+              <tr>
+                  <td>
+                      <form method="POST">
+                {% for question in form.questions %}
+                    <h5 class="card-title float-left text-success"><b>{{ question.question_text.label }}</b></h5>
+                    <br>
+                    <br>
+                    {{ question.hidden_tag() }}
+                    {{ question.radio_field }}
+                {% endfor %}
+                <div class="form-group mx-auto text-center float-center">
+                    {{ form.submit(class_="btn btn-success is-centered") }}
+                </div>
+                {{ form.hidden_tag() }}
+            </form>
+                  </td>
+              </tr>
+          </tbody>
+          </table>
+
           </div>
      </div>
     </div>

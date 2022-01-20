@@ -23,7 +23,7 @@
                     <td>{{ current_user.registered_on }}</td>
                     <td>{{ current_user.last_login }}</td>
                     <td>{{ quizzes_completed }}</td>
-                    <td>{{ average_quiz_score }}</td>
+                    <td>{{ average_quiz_score }}%</td>
                 </tr>
             </tbody>
           {% endif %}
@@ -74,7 +74,7 @@
                               <td>{{ teacher.name }}</td>
                               <td>{{ group.students|length }}</td>
                               <td>{{ group.key_stage }}</td>
-                              <td>{{ group_average_quiz_score }}</td>
+                              <td>{{ group_average_quiz_score }}%</td>
                           </tr>
                       {% endfor %}
                   {% endif %}
@@ -85,7 +85,7 @@
                           <td>{{ teacher.name }}</td>
                           <td>{{ students }}</td>
                           <td>{{ group.key_stage }}</td>
-                          <td>{{ group_average_quiz_score }}</td>
+                          <td>{{ group_average_quiz_score }}%</td>
                       </tr>
                       </tbody>
                   {% endif %}

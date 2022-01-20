@@ -1,13 +1,23 @@
 {% extends "base.html" %}
 {% block title %}Climate 4 Kids | Quiz{% endblock %}
 {% block content %}
-<div class="card text-center shadow p-3 mb-5 bg-blue rounded">
+<div class="card text-center shadow p-3 mb-5 bg-blue rounded mx-auto my-auto" style="width:50rem">
         <div class="card mb-3">
-          <div class="card-body" style="font-family: 'Comic Sans MS', serif">
-            <h5 class="card-title">Quiz Complete</h5>
-            <p class="card-text">
-                Score: {{ quiz_score }}%
-            </p>
+          <div class="card-body">
+              <h1 class="text-center">Quiz Complete</h1>
+              <br>
+              <table class="table text-left">
+                  <tr>
+                      <th>Quiz</th>
+                      <th>Score</th>
+                  </tr>
+                  <tbody>
+                  <tr>
+                      <td>{{ quiz.name }}</td>
+                      <td>{{ quiz_score }}%</td>
+                  </tr>
+                  </tbody>
+              </table>
           </div>
         </div>
 </div>

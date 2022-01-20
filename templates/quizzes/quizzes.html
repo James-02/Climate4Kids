@@ -1,29 +1,33 @@
 {% extends "base.html" %}
 {% block title %}Climate 4 Kids | Quizzes{% endblock %}
-{% block content %}<style>
-a:link {
-  color: yellow;
-  background-color: transparent;
-  text-decoration: none;
-}
+{% block content %}
 
-a:visited {
-  color: yellow;
-  background-color: transparent;
-  text-decoration: none;
-}
-
-a:hover {
-  color: yellow;
-  background-color: transparent;
-  text-decoration: underline;
-}
-</style>
-<ul style="font-family: 'Comic Sans MS', serif">
-    {% for item in nav.quiz_navbar %}
-    <li class="{{ 'active' if item.is_active else '' }}">
-        <a href="{{ item.url }}">{{ item.label }}</a>
-    </li>
-    {% endfor %}
-</ul>
+    <div class="card text-left border-primary shadow p-3 mb-5 bg-white rounded mx-auto" style="width: 45rem;height:auto;">
+     <div class="card mb-1">
+        <div class="card-body">
+            <h1 class="text-center">Quizzes</h1>
+            <table class="table">
+                {% for quiz in quizzes %}
+                <tbody>
+                <tr>
+                    <td>
+                    <b>KS{{ quiz.key_stage }}</b>
+                        <div class="quiz-main">
+                            {% if quiz.key_stage == '1' %}
+                                <img src="{{ url_for('static', filename='media/weather.png') }}" class="img-av" alt="Weather Quiz">
+                            {% elif quiz.key_stage == '2' %}
+                            <img src="{{ url_for('static', filename='media/climate_change.jpg') }}" class="img-av" alt="Weather Quiz">
+                            {% endif %}
+                            <a class=quiz-main-title href="{{ url_for('users.quiz_questions', quiz_id=quiz.id) }}">
+                                  {{ quiz.name }}
+                        </a>
+                    </div>
+                    </td>
+                </tr>
+            </tbody>
+                {% endfor %}
+            </table>
+        </div>
+     </div>
+    </div>
 {% endblock %}
