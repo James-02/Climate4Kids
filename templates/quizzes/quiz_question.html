@@ -4,12 +4,12 @@
     <div class="card text-start mx-auto my-auto shadow p-3 mb-5 bg-white rounded" style="width: 60rem">
      <div class="card mb-1">
           <div class="card-body" style="font-family: 'Comic Sans MS', serif">
-          <h1 class="text-center text-underline text-primary">{{ quiz.name }} Quiz</h1>
+          <h1 class="text-center text-underline text-success">{{ quiz.name }} Quiz</h1>
+          <form method="POST">
           <table>
           <tbody>
               <tr>
                   <td>
-                      <form method="POST">
                 {% for question in form.questions %}
                     <h5 class="card-title float-left text-success"><b>{{ question.question_text.label }}</b></h5>
                     <br>
@@ -17,16 +17,16 @@
                     {{ question.hidden_tag() }}
                     {{ question.radio_field }}
                 {% endfor %}
-                <div class="form-group mx-auto text-center float-center">
-                    {{ form.submit(class_="btn btn-success is-centered") }}
-                </div>
-                {{ form.hidden_tag() }}
+                
             </form>
                   </td>
               </tr>
-          </tbody>
-          </table>
-
+            </tbody>
+        </table>
+          <div class="form-group mx-auto text-center float-center">
+            {{ form.submit(class_="btn btn-success is-centered") }}
+          </div>
+            {{ form.hidden_tag() }}
           </div>
      </div>
     </div>
