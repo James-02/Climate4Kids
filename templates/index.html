@@ -1,52 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Climate 4 Kids | Home{% endblock %}
-
 {% block content %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <div class="test">
+    <div class="main-index-page">
+        <img src="{{ url_for('static', filename='media/globe-blue.png')}}" alt="Climate for Kids" class="home-img">
         <img src="{{ url_for('static', filename='media/text-blue.png')}}" alt="Climate for Kids" class="home-img">
-    </div>
-{#    <div class="card-review-1">#}
-{#        <div class="row d-flex">#}
-{#            <div class=""> <img class="profile-pic" src="{{ url_for('static', filename='media/stock-teacher.jpg')}}" alt=""> </div>#}
-{#            <div class="d-flex flex-column">#}
-{#                <h3 class="mt-2 mb-0">Miss Smith</h3>#}
-{#            <div>#}
-{#                <span class="fa fa-star checked"></span>#}
-{#                <span class="fa fa-star checked"></span>#}
-{#                <span class="fa fa-star checked"></span>#}
-{#                <span class="fa fa-star checked"></span>#}
-{#                <span class="fa fa-star checked"></span>#}
-{#            </div>#}
-{#            </div>#}
-{#        </div>#}
-{#        <div class="row text-left">#}
-{#            <h4 class="blue-text mt-3">"An excellent online learning platform, the children loved it and learned lots!"</h4>#}
-{#        </div>#}
-{#        <div>#}
-{#        <p class="text-muted pt-3 pt-sm-3">January 2022</p>#}
-{#            </div>#}
-{#    </div>#}
 
-    <div class="card-review-2">
-        <div class="row d-flex">
-            <div class=""> <img class="profile-pic" src="{{ url_for('static', filename='media/stock-teacher-2.jpg')}}" alt=""> </div>
-            <div class="d-flex flex-column">
-                <h3 class="mt-2 mb-0">Mr Fletcher</h3>
-            <div>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
+        {% if not current_user.is_authenticated %}
+            <div class="login-button">
+                <a href="{{ url_for('auth.login') }}" class="login-button btn btn-success"><b>I am a Student!</b></a>
             </div>
+            <div class="middle-text">
+                <b>OR</b>
             </div>
-        </div>
-        <div class="row text-left">
-            <h4 class="blue-text mt-3">"Climate4Kids is so easy to use and has so much available content for the children to use!"</h4>
-        </div>
-        <div>
-        <p class="text-muted pt-3 pt-sm-3">December 2021</p>
+            <div class="register-button"> 
+                <a href="{{ url_for('auth.register') }}" class="register-button btn btn-success"><b>I am a Teacher!</b></a>
             </div>
+        {% endif %}
     </div>
+
 {% endblock %}
