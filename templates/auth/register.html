@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Register{% endblock %}
+{% block title %}Climate4Kids | Register{% endblock %}
 {% block content %}
     <div class="card text-center shadow p-3 mb-5 bg-white rounded mx-auto my-auto" style="width: 35rem;">
         <div class="card mb-1">
@@ -20,7 +20,7 @@
         {% endwith %}
 
 
-            <form method="POST" class="form" action="{{ url_for('users.register') }}">
+            <form method="POST" class="form" action="{{ url_for('auth.register') }}">
             {{ form.csrf_token }}
                 <div class="form-group col mb-6">
                     {{ form.username(class_="form-control", placeholder="Username") }}

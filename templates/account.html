@@ -4,7 +4,7 @@
 {% if current_user.role == 'student' or current_user.role == 'teacher' %}
 <div class="card text-center border-primary shadow p-3 mb-5 bg-white rounded">
     <div class="card mb-1">
-      <img src="../static/media/avatar.png" class="card-img-av" alt="Default Avatar" style="float:left;width:72px;height:73px;">
+      <img src="{{ url_for('static', filename='media/avatar.png')}}" class="card-img-av" alt="Default Avatar" style="float:left;width:72px;height:73px;">
       <div class="card-body">
         <h1 class="user-dashboard">{{ current_user.name}}</h1>
           <br>
@@ -52,7 +52,7 @@
     {% if group != None %}
 <div class="card text-center border-primary shadow p-3 mb-5 bg-white rounded">
         <div class="card mb-1">
-          <img src="../static/media/group-avatar.png" class="card-img-av" alt="Default Group Avatar" style="float:left;width:72px;height:73px;">
+          <img src="{{ url_for('static', filename='media/group-avatar.png')}}" class="card-img-av" alt="Default Group Avatar" style="float:left;width:72px;height:73px;">
           <div class="card-body">
             <h1 class="group-dashboard">Groups</h1>
           <br>
