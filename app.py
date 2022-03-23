@@ -119,6 +119,7 @@ def requires_roles(*roles):
     def wrapper(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
+            
             if current_user.role not in roles:
                 # Redirect the user to an unauthorised notice!
                 return render_template('errors/403.html')
@@ -130,4 +131,4 @@ def requires_roles(*roles):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port='5050')
