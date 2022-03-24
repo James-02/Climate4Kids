@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Climate4Kids | Login{% endblock %}
 {% block content %}
-    <div class="card text-center shadow p-3 mb-5 bg-white rounded mx-auto my-auto" style="width: 35rem;">
+    <div class="info-card text-center shadow p-3 mb-5 bg-white rounded mx-auto my-auto" style="width: 35rem;">
         <div class="card mb-1">
           <div class="card-body">
             <h3 class="title is-3">Login</h3>
@@ -30,17 +30,11 @@
                     {{ form.password(class_="form-control", placeholder="Password", size=32) }}
                 </div>
 
-                <div class="form-group col mb-6">
-                    <div class="login-form-end form-check float-left">
-                        <input type="checkbox" class="form-check-input" id="remember" name="remember_me">
-                        <label class="form-check-label" for="remember">
-                            Remember me
-                        </label>
-                        <div style="width: 110px;"></div>
-                        <div class="forgotten-password" style="justify-content: end; padding: 2px;">
-                            <a class="nav-link" href="{{ url_for('users.forgotten_password') }}">Forgotten Password</a>
-                        </div>
-                        </div>
+                <div class="login-form form-group col mb-6">
+                    <div class="login-end">
+                        <div><input type="checkbox" class="form-check-input" id="remember" name="remember_me">Remember me</div>
+                        <div><a class="nav-link" href="{{ url_for('users.forgotten_password') }}">Forgotten Password</a></div>
+                    </div>
                     <div class="form-group col mb-6 float-left">
                         {{ form.submit(class_="btn btn-success is-centered") }}
                     </div>

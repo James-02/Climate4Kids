@@ -1,10 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Climate 4 Kids | Dashboard{% endblock %}
 {% block content %}
-<link rel="stylesheet" type="text/javascript" href="{{ url_for('static',filename='copytext.js') }}">
 
-<div class="card text-center shadow p-3 mb-5 bg-white rounded">
-    <a href="{{ url_for('groups.create_group')}}" class="btn btn-success" >Create a New Group</a>
+<!-- <div class="info-card text-center shadow p-3 mb-5 bg-white rounded">
     <div class="card mb-1">
           <div class="card-body">
             <h1 class="group-dashboard">Your Groups</h1>
@@ -28,7 +26,29 @@
                         </tr>
                     {% endfor %}
                 </tbody>
-              </table>
+            </table>
+            <a href="{{ url_for('groups.create_group')}}" class="btn btn-success" style="position:center;margin:5px;">Create a New Group</a>
+          </div>
+    </div>
+</div>  -->
+<div class="info-card text-center shadow p-3 mb-5 bg-white rounded">
+    <div class="card mb-1">
+          <div class="card-body">
+            <h1 class="group-dashboard">Your Groups</h1>
+                <div class="group-id">
+                    <div class="test"><b>Group Name</b></div>
+                    <div class="test"><b>Group Code</b></div>
+                    {% for group in groups %}
+                        <div class="test" id="groupName">
+                            <a style="text-decoration:none; color:black" href="/groups/{{group.id}}">{{ group.name }}</a>
+                            </div>
+                        <div class="test">
+                            {{ group.id }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <br>
+            <a href="{{ url_for('groups.create_group')}}" class="btn btn-success" style="position:center;margin:5px;">Create a New Group</a>
           </div>
     </div>
 </div>

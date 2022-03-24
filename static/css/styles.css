@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300&display=swap');
 
-/* -------------------------- base.html CSS Start -------------------------- */
+/* -------------------------- base.html CSS -------------------------- */
 html, body {
     position: relative;
     width: 100%;
@@ -61,6 +61,16 @@ html, body {
         height: 55px;
     }
 
+.navbar-brand:hover {
+    transition: all 0.1s linear;
+    transform: scale(1.03); /* (103% zoom)*/
+    }
+    
+    .nav-item:hover {
+    transition: all 0.1s linear;
+    transform: scale(1.03); /* (103% zoom)*/
+    }
+
 /* -------------------------- MAIN PAGE CONTENT -------------------------- */
 #pageContainer {
     padding: 0;
@@ -110,38 +120,46 @@ html, body {
     }
 
 @media (min-width: 1025px) {
-    #pageWrapper {
-        width: 90%;
-    }
-    .main-index-page {
-        width: 50%;
-    }
+    #pageWrapper {width: 90%;}
+    .main-index-page {width: 50%;}
+    .content-card {width: 80%;}
+    .info-card {width: 70%;}
 }
 
 @media (min-width: 481px) and (max-width: 1024px) {
-    #pageWrapper {
-        width: 90vw;
-    }
-    .main-index-page {
-        width: 40vw;
-    }
+    #pageWrapper {width: 90vw;}
+    .main-index-page {width: 40vw;}
+    .content-card {width: 80%;}
+    .info-card {width: 70%;}
 }
 
 @media (max-width: 480px) {
-    #pageWrapper {
-        width: 90vw;
-    }
-    .main-index-page {
-        width: 50vw;
-    }
+    #pageWrapper {width: 90vw;}
+    .main-index-page {width: 50vw;}
+    .content-card {width: 90%;}
+    .info-card {width: 90%;}
 }
 
-/* -------------------------- base.html CSS End -------------------------- */
+/* -------------------------- MAIN PAGE CONTENT END -------------------------- */
+
+/* -------------------------- base.html CSS END -------------------------- */
 
 .home-img {
     width: 50%;
     height: auto;
     margin: 10px;
+    transition: transform .2s;
+}
+
+.home-img:hover {
+    transform: scale(1.05);
+}
+
+.login-form-end {
+    display:flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center
 }
 
 .main-index-page {
@@ -156,6 +174,11 @@ html, body {
     margin-bottom: 7px;
     width: 100%;
     height: auto;
+    transition: transform .2s;
+}
+
+.login-button:hover {
+    transform: scale(1.03);
 }
 
 .register-button {
@@ -163,10 +186,16 @@ html, body {
     margin-bottom: 7px;
     width: 100%;
     height: auto;
+    transition: transform .2s;
 }
 
-.middle-text {
-    justify-self: center;
+.register-button:hover {
+    transform: scale(1.03);
+}
+
+/* --------------------- CARDS -------------------- */
+.card {
+    position: relative;
 }
 
 .card-img-av {
@@ -174,3 +203,84 @@ html, body {
     top: 5px;
     left: 5px;
 }
+
+.card-img-top {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.group-id {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: space-evenly;
+  }
+
+.test {
+    margin-left: 15%;
+    margin-right: 15%;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    border-bottom: 1px solid black;
+    transition: transform .2s;
+}
+
+#groupName:hover {
+    transform: scale(1.05);
+}
+
+.login-form {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+#card-button {
+    position:absolute;
+    right:15px;
+    top: 15px;
+}
+
+#card-button-edit {
+    position:absolute;
+    right:147px;
+    top: 15px;
+}
+
+#card-button-del {
+    position:absolute;
+    right:15px;
+    top: 15px;
+}
+
+#card-button-create {
+    position:absolute;
+    right: 160px;
+    top: 15px;
+}
+/* --------------------- CARDS END -------------------- */
+
+/* ------------------------ QUIZ ------------------------- */
+.quiz-main {
+    display: flex;
+    align-items:center;
+    position: relative;
+}
+
+.quiz-main-title:visited {
+    color: mediumpurple;
+    background-color: transparent;
+    text-decoration: none;
+}
+
+.quiz-main-title:hover {
+    color: blue;
+    transition: all 0.1s linear;
+    transform: scale(1.02);
+    background-color: transparent;
+    text-decoration: underline;
+}
+/* ------------------------ QUIZ END ------------------------ */
