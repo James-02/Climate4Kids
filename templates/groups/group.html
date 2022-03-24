@@ -4,7 +4,7 @@
 
     <script src="{{ url_for('static', filename='js/warning.js') }}"></script>
 
-<div class="card text-center shadow p-3 mb-5 bg-white rounded">
+<div class="info-card text-center shadow p-3 mb-5 bg-white rounded">
     <div class="card mb-1">
           <img src="{{ url_for('static', filename='media/group-avatar.png') }}" class="card-img-av" alt="Default Avatar" style="float:left;width:72px;height:73px;">
           <a href="{{ url_for('groups.edit_group', group_id=group.id)}}" id="card-button-edit" class="btn btn-success">Edit Group</a>
@@ -20,7 +20,7 @@
         </div>
 </div>
 
-<div class="card text-center shadow p-3 mb-5 bg-white rounded">
+<div class="info-card text-center shadow p-3 mb-5 bg-white rounded">
     <div class="card mb-1">
           <div class="card-body">
               <a href="{{ url_for('groups.create_students', group_id=group.id) }}" id="card-button-create" class="btn btn-success">Add Students</a>
