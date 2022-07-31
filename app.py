@@ -14,10 +14,10 @@ db = SQLAlchemy()
 
 # app configuration
 app = Flask(__name__, static_url_path='/static', static_folder='static')
-if app.config['ENV'] == 'production':
-    app.config.from_object('config.ProductionConfig')
-else:
-    app.config.from_object('config.DevelopmentConfig')
+# if app.config['ENV'] == 'development':
+#     app.config.from_object('config.ProductionConfig')
+# else:
+app.config.from_object('config.DevelopmentConfig')
 
 
 # logging
@@ -131,4 +131,4 @@ def requires_roles(*roles):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port='5050')
+    app.run(debug=True, host='0.0.0.0', port='5000')

@@ -307,7 +307,7 @@ def init_db():
         db.create_all()
         create_models()
         db.session.commit()
-        print(db, "\n===== SUCCESS ======")
+        print(f"\n===== Sucessfully created {db} ======")
 
 
 if __name__ == "__main__":
