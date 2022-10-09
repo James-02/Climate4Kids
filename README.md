@@ -18,3 +18,6 @@ Be careful, this will remove your venv, sqlite.db and .env
 
 # REPO
 https://github.com/James-02/Climate4Kids
+
+# Examples
+![745bcb9c4417e19bca95dc4d0d49b492](https://user-images.githubusercontent.com/67332910/194768000-6f240dd5-cb06-4176-ba8c-3fc6015ad92e.gif)
